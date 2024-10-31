@@ -130,12 +130,11 @@ fun LoginScreen(
                             cursorColor = Color.Black
                         ),
                         trailingIcon = {
-
                             IconButton(onClick = { contrasenaVisible = !contrasenaVisible }) {
                                 Icon(
                                     painter = painterResource(id = if (contrasenaVisible) R.drawable.on else R.drawable.off),
                                     contentDescription = if (contrasenaVisible) "Ocultar contraseña" else "Mostrar contraseña",
-                                    modifier = Modifier.size(24.dp) // Cambia 24.dp al tamaño que prefieras
+                                    modifier = Modifier.size(24.dp)
                                 )
                             }
                         }
@@ -149,6 +148,7 @@ fun LoginScreen(
                                 val usuarioResult = usuarioRepository.login(usuario.text, contrasena.text)
                                 if (usuarioResult != null) {
                                     onLoginSuccess(usuarioResult)
+                                    navController.navigate("interfaz_inicial") // Navega a InterfazInicialScreen
                                 } else {
                                     onLoginError("Credenciales incorrectas")
                                 }

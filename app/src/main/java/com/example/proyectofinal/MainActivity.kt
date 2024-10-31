@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.proyectofinal.Database.AppDatabase
 import com.example.proyectofinal.Model.Usuario
 import com.example.proyectofinal.Repository.UsuarioRepository
+import com.example.proyectofinal.UI.InterfazInicialScreen
 import com.example.proyectofinal.UI.RegistroAdminScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -48,15 +49,23 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
                 usuarioRepository = usuarioRepository,
                 coroutineScope = coroutineScope,
                 onLoginSuccess = { usuario ->
-                    navController.navigate("home") {
+                    // Cambiar a la ruta de InterfazInicialScreen
+                    navController.navigate("interfaz_inicial") {
                         popUpTo("login") { inclusive = true }
                     }
                 },
                 onLoginError = { error ->
                     // Manejo de errores (puedes mostrar un mensaje o un toast)
                 },
-                navController = navController // Aquí se pasa el navController
+                navController = navController // Se pasa el navController
             )
+        }
+        composable("interfaz_inicial") { // Define la pantalla de InterfazInicialScreen aquí
+            InterfazInicialScreen(onNavigate = {
+                navController.navigate("login") {
+                    popUpTo("interfaz_inicial") { inclusive = true }
+                }
+            })
         }
         composable("home") {
             Text("Bienvenido a la aplicación")
