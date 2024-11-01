@@ -17,6 +17,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import com.example.proyectofinal.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,7 +41,20 @@ fun RegistroAdminScreen(onRegister: (String, String, String, String, String, Str
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Registro de Administradores") },
+                title = {
+                    Text(
+                        text = "Formulario de registro",
+                        style = TextStyle(
+                            fontSize = 30.sp,
+                            fontWeight = FontWeight.W900,
+                            color = Color.Black
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp), // Separación desde el borde superior
+                        textAlign = TextAlign.Center
+                    )
+                },
                 colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xFFA5D6A7))
             )
         }
@@ -123,7 +137,7 @@ fun RegistroAdminScreen(onRegister: (String, String, String, String, String, Str
                             value = correo,
                             onValueChange = {
                                 correo = it
-                                emailValid = validarCorreo(correo) // Validar el correo
+                                emailValid = validarCorreo(correo)
                             },
                             label = { Text("Correo") },
                             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
@@ -203,14 +217,22 @@ fun RegistroAdminScreen(onRegister: (String, String, String, String, String, Str
                         )
                         Button(
                             onClick = {
-                                // Validar que todos los campos estén llenos
                                 fieldsValid = nombres.isNotEmpty() && apellidos.isNotEmpty() && nombreUsuario.isNotEmpty() &&
                                         correo.isNotEmpty() && contrasena.isNotEmpty() && confirmarContrasena.isNotEmpty()
 
-                                // Si los campos son válidos, llamar a la función onRegister
                                 if (fieldsValid && emailValid && contrasena == confirmarContrasena) {
                                     onRegister(nombres, apellidos, nombreUsuario, cargo, correo, contrasena)
-                                    showConfirmationDialog = true // Mostrar el diálogo de confirmación
+
+                                    // Limpiar campos después del registro exitoso
+                                    nombres = ""
+                                    apellidos = ""
+                                    cargo = ""
+                                    nombreUsuario = ""
+                                    correo = ""
+                                    contrasena = ""
+                                    confirmarContrasena = ""
+
+                                    showConfirmationDialog = true
                                 } else {
                                     showErrorDialog = true
                                 }
@@ -220,35 +242,37 @@ fun RegistroAdminScreen(onRegister: (String, String, String, String, String, Str
                         ) {
                             Text("Registrar")
                         }
-                        // Diálogo de error
-                        if (showErrorDialog) {
-                            AlertDialog(
-                                onDismissRequest = { showErrorDialog = false },
-                                title = { Text("Error") },
-                                text = { Text("Por favor, completa todos los campos correctamente.") },
-                                confirmButton = {
-                                    Button(onClick = { showErrorDialog = false }) {
-                                        Text("Aceptar")
-                                    }
-                                }
-                            )
-                        }
-                        // Diálogo de confirmación
-                        if (showConfirmationDialog) {
-                            AlertDialog(
-                                onDismissRequest = { showConfirmationDialog = false },
-                                title = { Text("Registro Exitoso") },
-                                text = { Text("El registro se ha completado satisfactoriamente.") },
-                                confirmButton = {
-                                    Button(onClick = { showConfirmationDialog = false }) {
-                                        Text("Aceptar")
-                                    }
-                                }
-                            )
-                        }
                     }
                 }
             }
+        }
+
+        // Diálogo de error
+        if (showErrorDialog) {
+            AlertDialog(
+                onDismissRequest = { showErrorDialog = false },
+                title = { Text("Error") },
+                text = { Text("Por favor, completa todos los campos correctamente.") },
+                confirmButton = {
+                    Button(onClick = { showErrorDialog = false }) {
+                        Text("Aceptar")
+                    }
+                }
+            )
+        }
+
+        // Diálogo de confirmación
+        if (showConfirmationDialog) {
+            AlertDialog(
+                onDismissRequest = { showConfirmationDialog = false },
+                title = { Text("Registro Exitoso") },
+                text = { Text("El usuario ha sido registrado correctamente.") },
+                confirmButton = {
+                    Button(onClick = { showConfirmationDialog = false }) {
+                        Text("Aceptar")
+                    }
+                }
+            )
         }
     }
 }

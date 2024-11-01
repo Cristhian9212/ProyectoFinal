@@ -148,7 +148,7 @@ fun LoginScreen(
                                 val usuarioResult = usuarioRepository.login(usuario.text, contrasena.text)
                                 if (usuarioResult != null) {
                                     onLoginSuccess(usuarioResult)
-                                    navController.navigate("interfaz_inicial") // Navega a InterfazInicialScreen
+                                    navController.navigate("interfazInicial") // Cambiado de "interfaz_inicial" a "interfazInicial"
                                 } else {
                                     onLoginError("Credenciales incorrectas")
                                 }
