@@ -58,18 +58,20 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
                 navController = navController // Aquí se pasa el navController
             )
         }
-        composable("home") {
-            Text("Bienvenido a la aplicación")
-        }
         composable("registro") {
-            RegistroAdminScreen { nombreUsuario, contrasena, correo ->
-                // Manejo del registro
-                val nuevoUsuario = Usuario(nombreUsuario = nombreUsuario, contrasena = contrasena, correo = correo)
+            RegistroAdminScreen { nombres, apellidos, nombreUsuario, cargo, correo, contrasena ->
 
-                // Insertar el nuevo usuario en la base de datos
+                val nuevoUsuario = Usuario(
+                    nombres = nombres,
+                    apellidos = apellidos,
+                    nombreUsuario = nombreUsuario,
+                    cargo = cargo,
+                    correo = correo,
+                    contrasena = contrasena
+                )
+
                 coroutineScope.launch {
                     usuarioRepository.insertar(nuevoUsuario)
-                    // Navegar de regreso a la pantalla de login o a donde desees después de registrar
                     navController.navigate("login") {
                         popUpTo("registro") { inclusive = true }
                     }

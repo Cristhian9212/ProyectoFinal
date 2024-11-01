@@ -2,6 +2,7 @@ package com.example.proyectofinal.UI
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -9,9 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -23,14 +21,20 @@ import com.example.proyectofinal.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistroAdminScreen(onRegister: (String, String, String) -> Unit) {
+fun RegistroAdminScreen(onRegister: (String, String, String, String, String, String) -> Unit) {
     var nombreUsuario by remember { mutableStateOf("") }
     var contrasena by remember { mutableStateOf("") }
     var confirmarContrasena by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
+    var cargo by remember { mutableStateOf("") }
+    var nombres by remember { mutableStateOf("") }
+    var apellidos by remember { mutableStateOf("") }
     var mostrarContrasena by remember { mutableStateOf(false) }
     var mostrarConfirmacionContrasena by remember { mutableStateOf(false) }
-
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var showConfirmationDialog by remember { mutableStateOf(false) }
+    var fieldsValid by remember { mutableStateOf(true) }
+    var emailValid by remember { mutableStateOf(true) }
     val complejidadContrasena = calcularComplejidadContrasena(contrasena)
 
     Scaffold(
@@ -41,162 +45,207 @@ fun RegistroAdminScreen(onRegister: (String, String, String) -> Unit) {
             )
         }
     ) { padding ->
-        // Ajustar el padding inferior dinámicamente según la aparición del teclado
-        val view = LocalView.current
-        val density = LocalDensity.current
 
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(bottom = with(density) { LocalContext.current.resources.configuration.keyboard != null && LocalContext.current.resources.configuration.keyboard > 0 }.let { if (it) 16.dp else 0.dp }) // Padding inferior para el teclado
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(Color(0xFFA5D6A7), Color.White)
                     )
                 )
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ElevatedCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+            item {
+                ElevatedCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
-                    OutlinedTextField(
-                        value = nombreUsuario,
-                        onValueChange = { nombreUsuario = it },
-                        label = { Text("Nombre de Usuario") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color.White,
-                            cursorColor = Color.Black
-                        )
-                    )
-
-                    OutlinedTextField(
-                        value = contrasena,
-                        onValueChange = { contrasena = it },
-                        label = { Text("Contraseña") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        visualTransformation = if (mostrarContrasena) VisualTransformation.None else PasswordVisualTransformation(),
-                        shape = RoundedCornerShape(12.dp),
-                        textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color.White,
-                            cursorColor = Color.Black
-                        ),
-                        trailingIcon = {
-                            val icon = if (mostrarContrasena) {
-                                painterResource(id = R.drawable.on)
-                            } else {
-                                painterResource(id = R.drawable.off)
-                            }
-                            IconButton(onClick = { mostrarContrasena = !mostrarContrasena }) {
-                                Icon(painter = icon, contentDescription = null, modifier = Modifier.size(24.dp))
-                            }
-                        }
-                    )
-
-                    // Solo se muestra la barra de complejidad para la contraseña
-                    ComplejidadBar(contrasena = contrasena, complejidad = complejidadContrasena)
-
-                    OutlinedTextField(
-                        value = confirmarContrasena,
-                        onValueChange = { confirmarContrasena = it },
-                        label = { Text("Confirmar Contraseña") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        visualTransformation = if (mostrarConfirmacionContrasena) VisualTransformation.None else PasswordVisualTransformation(),
-                        shape = RoundedCornerShape(12.dp),
-                        textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color.White,
-                            cursorColor = Color.Black
-                        ),
-                        trailingIcon = {
-                            val icon = if (mostrarConfirmacionContrasena) {
-                                painterResource(id = R.drawable.on)
-                            } else {
-                                painterResource(id = R.drawable.off)
-                            }
-                            IconButton(onClick = { mostrarConfirmacionContrasena = !mostrarConfirmacionContrasena }) {
-                                Icon(painter = icon, contentDescription = null, modifier = Modifier.size(24.dp))
-                            }
-                        }
-                    )
-
-                    // Mostrar mensaje de coincidencia de contraseñas
-                    Text(
-                        text = if (confirmarContrasena.isNotEmpty()) {
-                            if (contrasena == confirmarContrasena) {
-                                "Las contraseñas coinciden"
-                            } else {
-                                "Las contraseñas no coinciden"
-                            }
-                        } else {
-                            ""
-                        },
-                        color = if (contrasena == confirmarContrasena) Color.Black else Color.Red,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-
-                    OutlinedTextField(
-                        value = correo,
-                        onValueChange = { correo = it },
-                        label = { Text("Correo") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color.White,
-                            cursorColor = Color.Black
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    Button(
-                        onClick = {
-                            if (contrasena == confirmarContrasena) {
-                                onRegister(nombreUsuario, contrasena, correo)
-                            } else {
-                                // Manejar error si las contraseñas no coinciden
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF388E3C),
-                            contentColor = Color.White
-                        ),
-                        shape = RoundedCornerShape(12.dp)
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = "Registrar",
-                            style = TextStyle(
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold
+                        // Campos de entrada
+                        OutlinedTextField(
+                            value = nombres,
+                            onValueChange = { nombres = it },
+                            label = { Text("Nombres") },
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                containerColor = Color.White,
+                                cursorColor = Color.Black
                             )
                         )
+                        OutlinedTextField(
+                            value = apellidos,
+                            onValueChange = { apellidos = it },
+                            label = { Text("Apellidos") },
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                containerColor = Color.White,
+                                cursorColor = Color.Black
+                            )
+                        )
+                        OutlinedTextField(
+                            value = cargo,
+                            onValueChange = { cargo = it },
+                            label = { Text("Cargo") },
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                containerColor = Color.White,
+                                cursorColor = Color.Black
+                            )
+                        )
+                        OutlinedTextField(
+                            value = nombreUsuario,
+                            onValueChange = { nombreUsuario = it },
+                            label = { Text("Nombre de Usuario") },
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                containerColor = Color.White,
+                                cursorColor = Color.Black
+                            )
+                        )
+                        OutlinedTextField(
+                            value = correo,
+                            onValueChange = {
+                                correo = it
+                                emailValid = validarCorreo(correo) // Validar el correo
+                            },
+                            label = { Text("Correo") },
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                containerColor = Color.White,
+                                cursorColor = Color.Black
+                            )
+                        )
+                        if (!emailValid) {
+                            Text(
+                                text = "Formato de correo inválido",
+                                color = Color.Red,
+                                style = TextStyle(fontSize = 12.sp)
+                            )
+                        }
+                        OutlinedTextField(
+                            value = contrasena,
+                            onValueChange = { contrasena = it },
+                            label = { Text("Contraseña") },
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            visualTransformation = if (mostrarContrasena) VisualTransformation.None else PasswordVisualTransformation(),
+                            shape = RoundedCornerShape(12.dp),
+                            textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                containerColor = Color.White,
+                                cursorColor = Color.Black
+                            ),
+                            trailingIcon = {
+                                val icon = if (mostrarContrasena) {
+                                    painterResource(id = R.drawable.on)
+                                } else {
+                                    painterResource(id = R.drawable.off)
+                                }
+                                IconButton(onClick = { mostrarContrasena = !mostrarContrasena }) {
+                                    Icon(painter = icon, contentDescription = null, modifier = Modifier.size(24.dp))
+                                }
+                            }
+                        )
+                        ComplejidadBar(contrasena = contrasena, complejidad = complejidadContrasena)
+                        OutlinedTextField(
+                            value = confirmarContrasena,
+                            onValueChange = { confirmarContrasena = it },
+                            label = { Text("Confirmar Contraseña") },
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            visualTransformation = if (mostrarConfirmacionContrasena) VisualTransformation.None else PasswordVisualTransformation(),
+                            shape = RoundedCornerShape(12.dp),
+                            textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                containerColor = Color.White,
+                                cursorColor = Color.Black
+                            ),
+                            trailingIcon = {
+                                val icon = if (mostrarConfirmacionContrasena) {
+                                    painterResource(id = R.drawable.on)
+                                } else {
+                                    painterResource(id = R.drawable.off)
+                                }
+                                IconButton(onClick = { mostrarConfirmacionContrasena = !mostrarConfirmacionContrasena }) {
+                                    Icon(painter = icon, contentDescription = null, modifier = Modifier.size(24.dp))
+                                }
+                            }
+                        )
+                        Text(
+                            text = if (confirmarContrasena.isNotEmpty()) {
+                                if (contrasena == confirmarContrasena) {
+                                    "Las contraseñas coinciden"
+                                } else {
+                                    "Las contraseñas no coinciden"
+                                }
+                            } else {
+                                ""
+                            },
+                            color = if (contrasena == confirmarContrasena) Color.Black else Color.Red,
+                            style = TextStyle(fontSize = 12.sp)
+                        )
+                        Button(
+                            onClick = {
+                                // Validar que todos los campos estén llenos
+                                fieldsValid = nombres.isNotEmpty() && apellidos.isNotEmpty() && nombreUsuario.isNotEmpty() &&
+                                        correo.isNotEmpty() && contrasena.isNotEmpty() && confirmarContrasena.isNotEmpty()
+
+                                // Si los campos son válidos, llamar a la función onRegister
+                                if (fieldsValid && emailValid && contrasena == confirmarContrasena) {
+                                    onRegister(nombres, apellidos, nombreUsuario, cargo, correo, contrasena)
+                                    showConfirmationDialog = true // Mostrar el diálogo de confirmación
+                                } else {
+                                    showErrorDialog = true
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
+                        ) {
+                            Text("Registrar")
+                        }
+                        // Diálogo de error
+                        if (showErrorDialog) {
+                            AlertDialog(
+                                onDismissRequest = { showErrorDialog = false },
+                                title = { Text("Error") },
+                                text = { Text("Por favor, completa todos los campos correctamente.") },
+                                confirmButton = {
+                                    Button(onClick = { showErrorDialog = false }) {
+                                        Text("Aceptar")
+                                    }
+                                }
+                            )
+                        }
+                        // Diálogo de confirmación
+                        if (showConfirmationDialog) {
+                            AlertDialog(
+                                onDismissRequest = { showConfirmationDialog = false },
+                                title = { Text("Registro Exitoso") },
+                                text = { Text("El registro se ha completado satisfactoriamente.") },
+                                confirmButton = {
+                                    Button(onClick = { showConfirmationDialog = false }) {
+                                        Text("Aceptar")
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -204,9 +253,11 @@ fun RegistroAdminScreen(onRegister: (String, String, String) -> Unit) {
     }
 }
 
-// ... El resto de tu código sigue igual ...
-
-
+// Función para validar el correo electrónico
+fun validarCorreo(correo: String): Boolean {
+    val regex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
+    return regex.matches(correo)
+}
 @Composable
 fun ComplejidadBar(contrasena: String, complejidad: Int) {
     if (contrasena.isNotEmpty()) {
@@ -227,7 +278,7 @@ fun ComplejidadBar(contrasena: String, complejidad: Int) {
                     fontWeight = FontWeight.Medium,
                     color = when (complejidad) {
                         1 -> Color.Red
-                        2 -> Color.Yellow
+                        2 -> Color(0xFFFFA500)
                         3 -> Color.Green
                         else -> Color.Transparent
                     }
@@ -240,7 +291,7 @@ fun ComplejidadBar(contrasena: String, complejidad: Int) {
                 progress = complejidad / 3f,
                 color = when (complejidad) {
                     1 -> Color.Red
-                    2 -> Color.Yellow
+                    2 -> Color(0xFFFFA500)
                     3 -> Color.Green
                     else -> Color.Transparent
                 },
