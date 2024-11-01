@@ -148,7 +148,9 @@ fun LoginScreen(
                                 val usuarioResult = usuarioRepository.login(usuario.text, contrasena.text)
                                 if (usuarioResult != null) {
                                     onLoginSuccess(usuarioResult)
-                                    navController.navigate("interfazInicial") // Cambiado de "interfaz_inicial" a "interfazInicial"
+                                    navController.navigate("home") { // Cambia "interfazInicial" a "home" para navegación correcta
+                                        popUpTo("login") { inclusive = true }
+                                    }
                                 } else {
                                     onLoginError("Credenciales incorrectas")
                                 }
@@ -168,7 +170,7 @@ fun LoginScreen(
                     ClickableText(
                         text = AnnotatedString("¿No tienes una cuenta? Regístrate"),
                         onClick = {
-                            navController.navigate("registro") // Asegúrate de que la ruta sea correcta
+                            navController.navigate("registro") // Mantén la ruta a "registro" sin cambios
                         },
                         style = TextStyle(
                             color = Color(0xFF388E3C),

@@ -15,8 +15,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.proyectofinal.Database.AppDatabase
 import com.example.proyectofinal.Model.Usuario
 import com.example.proyectofinal.Repository.UsuarioRepository
-import com.example.proyectofinal.UI.InterfazInicialScreen
-import com.example.proyectofinal.UI.RegistroAdminScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -61,7 +59,6 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
         }
         composable("registro") {
             RegistroAdminScreen { nombres, apellidos, nombreUsuario, cargo, correo, contrasena ->
-
                 val nuevoUsuario = Usuario(
                     nombres = nombres,
                     apellidos = apellidos,
@@ -71,17 +68,26 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
                     contrasena = contrasena
                 )
 
-                composable("interfaz_inicial") { // Define la pantalla de InterfazInicialScreen aquí
-                    InterfazInicialScreen(onNavigate = {
-                        navController.navigate("login") {
-                            popUpTo("interfaz_inicial") { inclusive = true }
-                        }
-                    })
+                // Guarda el nuevo usuario en el repositorio en una coroutine
+                coroutineScope.launch {
+                    usuarioRepository.insertar(nuevoUsuario)
                 }
-                composable("home") {
-                    Text("Bienvenido a la aplicación")
+
+                // Navega a la pantalla de interfaz inicial después del registro
+                navController.navigate("interfaz_inicial") {
+                    popUpTo("registro") { inclusive = true }
                 }
             }
+        }
+        composable("interfaz_inicial") {
+            InterfazInicialScreen(onNavigate = {
+                navController.navigate("login") {
+                    popUpTo("interfaz_inicial") { inclusive = true }
+                }
+            })
+        }
+        composable("home") {
+            Text("Bienvenido a la aplicación")
         }
     }
 }
