@@ -47,7 +47,8 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
                 usuarioRepository = usuarioRepository,
                 coroutineScope = coroutineScope,
                 onLoginSuccess = { usuario ->
-                    navController.navigate("home") {
+                    // Navegar a "interfaz_inicial" en lugar de "home"
+                    navController.navigate("interfaz_inicial") {
                         popUpTo("login") { inclusive = true }
                     }
                 },
@@ -72,11 +73,6 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
                 coroutineScope.launch {
                     usuarioRepository.insertar(nuevoUsuario)
                 }
-
-                // Navega a la pantalla de interfaz inicial después del registro
-                navController.navigate("interfaz_inicial") {
-                    popUpTo("registro") { inclusive = true }
-                }
             }
         }
         composable("interfaz_inicial") {
@@ -85,9 +81,6 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
                     popUpTo("interfaz_inicial") { inclusive = true }
                 }
             })
-        }
-        composable("home") {
-            Text("Bienvenido a la aplicación")
         }
     }
 }

@@ -39,7 +39,8 @@ fun LoginScreen(
 ) {
     var usuario by remember { mutableStateOf(TextFieldValue("")) }
     var contrasena by remember { mutableStateOf(TextFieldValue("")) }
-    var contrasenaVisible by remember { mutableStateOf(false) } // Estado para la visibilidad de la contraseña
+    var contrasenaVisible by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") } // Estado para el mensaje de error
 
     Box(
         modifier = Modifier
@@ -142,18 +143,33 @@ fun LoginScreen(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
+                    // Mostrar el mensaje de error si existe
+                    if (errorMessage.isNotEmpty()) {
+                        Text(
+                            text = errorMessage,
+                            color = Color.Red,
+                            style = TextStyle(fontSize = 14.sp),
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    }
+
                     Button(
                         onClick = {
-                            coroutineScope.launch {
-                                val usuarioResult = usuarioRepository.login(usuario.text, contrasena.text)
-                                if (usuarioResult != null) {
-                                    onLoginSuccess(usuarioResult)
-                                    navController.navigate("home") { // Cambia "interfazInicial" a "home" para navegación correcta
-                                        popUpTo("login") { inclusive = true }
+                            // Validación de campos
+                            if (usuario.text.isNotEmpty() && contrasena.text.isNotEmpty()) {
+                                coroutineScope.launch {
+                                    val usuarioResult = usuarioRepository.login(usuario.text, contrasena.text)
+                                    if (usuarioResult != null) {
+                                        onLoginSuccess(usuarioResult)
+                                        navController.navigate("interfaz_inicial") {
+                                            popUpTo("interfaz_inicial") { inclusive = true }
+                                        }
+                                    } else {
+                                        errorMessage = "Credenciales incorrectas"
                                     }
-                                } else {
-                                    onLoginError("Credenciales incorrectas")
                                 }
+                            } else {
+                                errorMessage = "Por favor, ingrese usuario y contraseña" // Mensaje si los campos están vacíos
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -170,7 +186,7 @@ fun LoginScreen(
                     ClickableText(
                         text = AnnotatedString("¿No tienes una cuenta? Regístrate"),
                         onClick = {
-                            navController.navigate("registro") // Mantén la ruta a "registro" sin cambios
+                            navController.navigate("registro")
                         },
                         style = TextStyle(
                             color = Color(0xFF388E3C),
