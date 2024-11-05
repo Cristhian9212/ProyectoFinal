@@ -47,15 +47,12 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
                 usuarioRepository = usuarioRepository,
                 coroutineScope = coroutineScope,
                 onLoginSuccess = { usuario ->
-                    // Navegar a "interfaz_inicial" en lugar de "home"
                     navController.navigate("interfaz_inicial") {
                         popUpTo("login") { inclusive = true }
                     }
                 },
-                onLoginError = { error ->
-                    // Manejo de errores (puedes mostrar un mensaje o un toast)
-                },
-                navController = navController // Aquí se pasa el navController
+                onLoginError = { error -> /* Manejo de errores */ },
+                navController = navController
             )
         }
         composable("registro") {
@@ -68,19 +65,19 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
                     correo = correo,
                     contrasena = contrasena
                 )
-
-                // Guarda el nuevo usuario en el repositorio en una coroutine
                 coroutineScope.launch {
                     usuarioRepository.insertar(nuevoUsuario)
                 }
             }
         }
         composable("interfaz_inicial") {
-            InterfazInicialScreen(onNavigate = {
-                navController.navigate("login") {
-                    popUpTo("interfaz_inicial") { inclusive = true }
-                }
-            })
+            InterfazInicialScreen(navController = navController) // Pasar el navController aquí
+        }
+        composable("registrosequipos") {
+            RegistrosequiposScreen(navController) // Aquí agregamos la nueva pantalla
+        }
+        composable("registrosolicitante") {
+        RegistroSolicitanteScreen(navController) // Aquí agregamos la nueva pantalla
         }
     }
 }

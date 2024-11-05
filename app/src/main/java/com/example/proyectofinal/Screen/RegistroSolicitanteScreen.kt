@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InterfazInicialScreen(navController: NavController) {
+fun RegistroSolicitanteScreen(navController: NavController) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -65,7 +65,7 @@ fun InterfazInicialScreen(navController: NavController) {
                     TopAppBar(
                         title = {
                             Text(
-                                text = "Inicio",
+                                text = "Registro de solicitantes",
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
