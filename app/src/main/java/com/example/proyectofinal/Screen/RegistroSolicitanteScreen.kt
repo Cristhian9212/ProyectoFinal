@@ -10,41 +10,63 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.proyectofinal.Model.Solicitante
+import com.example.proyectofinal.Repository.UsuarioRepository
 import com.example.proyectofinal.Screen.DrawerContent
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistroSolicitanteScreen(navController: NavController) {
+fun RegistroSolicitanteScreen(
+    navController: NavController,
+    usuarioRepository: UsuarioRepository,
+    onSaveEquipo: (String, String, String, String, Int) -> Unit // Añadimos `creadoPor` como parámetro
+) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    val onNavigate: (String) -> Unit = { route ->
-        navController.navigate(route)
-        scope.launch { drawerState.close() }
+    // Variables de estado para cada campo del formulario
+    var nombre by remember { mutableStateOf("") }
+    var apellido by remember { mutableStateOf("") }
+    var correo by remember { mutableStateOf("") }
+    var telefono by remember { mutableStateOf("") }
+
+    // Variables de estado para el login del usuario
+    var nombreUsuario by remember { mutableStateOf("") }
+    var contrasena by remember { mutableStateOf("") }
+    var idUsuario by remember { mutableStateOf<Int?>(null) }
+
+    // Lógica para autenticar usuario y obtener `creadoPor`
+    LaunchedEffect(Unit) {
+        val usuario = usuarioRepository.login(nombreUsuario, contrasena)
+        idUsuario = usuario?.idUsuario
     }
+
     ModalNavigationDrawer(
         drawerContent = {
             if (drawerState.isOpen) {
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(300.dp) // Define el ancho del Drawer
+                        .width(300.dp)
                         .background(Color.White)
                 ) {
-                    DrawerContent(onNavigate)
+                    DrawerContent { route ->
+                        navController.navigate(route)
+                        scope.launch { drawerState.close() }
+                    }
                 }
             }
         },
         drawerState = drawerState,
-        gesturesEnabled = true // Permite que se cierre tocando fuera del Drawer
+        gesturesEnabled = true
     ) {
         Scaffold(
             topBar = {
@@ -88,44 +110,88 @@ fun RegistroSolicitanteScreen(navController: NavController) {
                 }
             },
             content = { paddingValues ->
-                Box(
-                    modifier = Modifier.fillMaxSize()
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(horizontal = 32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    // Imagen de fondo
-                    val backgroundImage: Painter = painterResource(id = R.drawable.fondoprincipal)
-                    Image(
-                        painter = backgroundImage,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentScale = ContentScale.Crop
-
+                    // Login Form
+                    OutlinedTextField(
+                        value = nombreUsuario,
+                        onValueChange = { nombreUsuario = it },
+                        label = { Text("Nombre de Usuario") },
+                        modifier = Modifier.fillMaxWidth()
                     )
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.White.copy(alpha = 0.6f)) // Cambia la opacidad según sea necesario
-                    )
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                    // Contenido en primer plano
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                    OutlinedTextField(
+                        value = contrasena,
+                        onValueChange = { contrasena = it },
+                        label = { Text("Contraseña") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                val usuario = usuarioRepository.login(nombreUsuario, contrasena)
+                                idUsuario = usuario?.idUsuario
+                            }
+                        }
                     ) {
-                        Text(
-                            text = "Bienvenido a la Interfaz Inicial",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onBackground // Asegura que el texto se vea bien sobre el fondo
-                        )
+                        Text("Iniciar Sesión")
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // Registro Form
+                    OutlinedTextField(
+                        value = nombre,
+                        onValueChange = { nombre = it },
+                        label = { Text("Nombre") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    OutlinedTextField(
+                        value = apellido,
+                        onValueChange = { apellido = it },
+                        label = { Text("Apellido") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    OutlinedTextField(
+                        value = correo,
+                        onValueChange = { correo = it },
+                        label = { Text("Correo") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    OutlinedTextField(
+                        value = telefono,
+                        onValueChange = { telefono = it },
+                        label = { Text("Teléfono") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Button(
+                        onClick = {
+                            idUsuario?.let { idUsuario ->
+                                onSaveEquipo(nombre, apellido, correo, telefono, idUsuario)
+                            }
+                        }
+                    ) {
+                        Text("Guardar Solicitante")
                     }
                 }
             }
-
         )
     }
-
 }

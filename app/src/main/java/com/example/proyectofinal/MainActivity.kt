@@ -12,8 +12,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.proyectofinal.DAO.SolicitanteDao
 import com.example.proyectofinal.Database.AppDatabase
+import com.example.proyectofinal.Model.Computador
+import com.example.proyectofinal.Model.Solicitante
 import com.example.proyectofinal.Model.Usuario
+import com.example.proyectofinal.Repository.ComputadorRepository
+import com.example.proyectofinal.Repository.SolicitanteRepository
 import com.example.proyectofinal.Repository.UsuarioRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -40,6 +45,10 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
     val database = remember { AppDatabase.getDatabase(context) }
     val usuarioDao = database.usuarioDao()
     val usuarioRepository = UsuarioRepository(usuarioDao)
+    val ComputadorDao = database.computadorDao()
+    val ComputadorRepository = ComputadorRepository(ComputadorDao)
+    val SolicitanteDao = database.solicitanteDao()
+    val SolicitanteRepository = SolicitanteRepository(SolicitanteDao)
 
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
@@ -74,10 +83,39 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
             InterfazInicialScreen(navController = navController) // Pasar el navController aquí
         }
         composable("registrosequipos") {
-            RegistrosequiposScreen(navController) // Aquí agregamos la nueva pantalla
+            RegistrosequiposScreen(
+                navController = navController,
+                onSaveEquipo = { marca, modelo, numeroSerie, estado ->
+                    val nuevoEquipo = Computador(
+                        marca = marca,
+                        modelo = modelo,
+                        numeroSerie = numeroSerie,
+                        estado = estado
+                    )
+                    coroutineScope.launch {
+                        ComputadorRepository.insertar(nuevoEquipo)
+                    }
+                }
+            )
         }
         composable("registrosolicitante") {
-        RegistroSolicitanteScreen(navController) // Aquí agregamos la nueva pantalla
+            RegistroSolicitanteScreen(
+                navController = navController,
+                usuarioRepository = usuarioRepository,
+                onSaveEquipo = { nombre, apellido, correo, telefono, idUsuario -> // Asegúrate de recibir idUsuarioCreadoPor
+                    val nuevoSolicitante = Solicitante(
+                        nombre = nombre,
+                        apellido = apellido,
+                        correo = correo,
+                        telefono = telefono,
+                        idUsuario = idUsuario// Aquí pasas el idUsuario
+                    )
+                    coroutineScope.launch {
+                        SolicitanteRepository.insertar(nuevoSolicitante)
+                    }
+                }
+            )
         }
+
     }
 }

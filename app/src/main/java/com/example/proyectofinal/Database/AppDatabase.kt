@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.example.proyectofinal.DAO.*
 import com.example.proyectofinal.Model.*
 
-@Database(entities = [Usuario::class, Solicitante::class, Computador::class, Prestamo::class], version = 1, exportSchema = false)
+@Database(entities = [Usuario::class, Solicitante::class, Computador::class, Prestamo::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun usuarioDao(): UsuarioDao
     abstract fun solicitanteDao(): SolicitanteDao

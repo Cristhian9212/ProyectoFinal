@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
     foreignKeys = [ForeignKey(
         entity = Usuario::class,
         parentColumns = ["idUsuario"],
-        childColumns = ["creadoPor"],
+        childColumns = ["idUsuario"],
         onDelete = ForeignKey.CASCADE
     )]
 )
@@ -20,5 +20,5 @@ data class Solicitante(
     val apellido: String,
     val correo: String,
     val telefono: String,
-    val creadoPor: Int // FK hacia Usuario
+    val idUsuario: Int // FK hacia Usuario
 )
