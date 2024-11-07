@@ -125,7 +125,6 @@ fun DrawerContent(onNavigate: (String) -> Unit) {
                 .padding(8.dp), // Espaciado alrededor de la Card
             colors = CardDefaults.cardColors(containerColor = Color(0xFFE0E0E0)),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-            //  border = BorderStroke(2.dp, Color.Gray) // Añade un borde gris a la Card
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Image(
@@ -198,7 +197,7 @@ fun DrawerContent(onNavigate: (String) -> Unit) {
                     Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el ícono y el texto
                     TextButton(
                         onClick = { onNavigate("registrosolicitante")},
-                        colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF2AA345))
+                        colors = ButtonDefaults.textButtonColors(contentColor = Color.White)
                     ) {
                         Text(text = "Registrar solicitante")
                     }
@@ -242,8 +241,8 @@ fun DrawerContent(onNavigate: (String) -> Unit) {
                     )
                     Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el ícono y el texto
                     TextButton(
-                        onClick = { /* Navegar a Sección 1 */ },
-                        colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF2AA345))
+                        onClick = {onNavigate("registro-prestamo")},
+                        colors = ButtonDefaults.textButtonColors(contentColor = Color.White)
                     ) {
                         Text(text = "Prestamos de equipos")
                     }

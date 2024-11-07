@@ -5,19 +5,19 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.proyectofinal.DAO.SolicitanteDao
 import com.example.proyectofinal.Database.AppDatabase
 import com.example.proyectofinal.Model.Computador
+import com.example.proyectofinal.Model.Prestamo
 import com.example.proyectofinal.Model.Solicitante
 import com.example.proyectofinal.Model.Usuario
 import com.example.proyectofinal.Repository.ComputadorRepository
+import com.example.proyectofinal.Repository.PrestamoRepository
 import com.example.proyectofinal.Repository.SolicitanteRepository
 import com.example.proyectofinal.Repository.UsuarioRepository
 import kotlinx.coroutines.CoroutineScope
@@ -49,6 +49,8 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
     val ComputadorRepository = ComputadorRepository(ComputadorDao)
     val SolicitanteDao = database.solicitanteDao()
     val SolicitanteRepository = SolicitanteRepository(SolicitanteDao)
+    val PrestamoDao = database.prestamoDao()
+    val prestamoRepository = PrestamoRepository(PrestamoDao)
 
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
@@ -116,6 +118,24 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
                 }
             )
         }
+        composable("registro-prestamo") {
+            RegistroPrestamosScreen(
+                navController = navController,
+                prestamoRepository = prestamoRepository,
+                onSaveEquipo = { idSolicitante, idComputador, fechaPrestamo, fechaDevolucion, fechaDevuelta ->
+                    val nuevoPrestamo = Prestamo(
+                        idSolicitante = idSolicitante,
+                        idComputador = idComputador,
+                        fechaPrestamo = fechaPrestamo,
+                        fechaDevolucion = fechaDevolucion,
 
+                        fechaDevuelta = fechaDevuelta
+                    )
+                    coroutineScope.launch {
+                        PrestamoRepository.insertar(nuevoPrestamo)
+                    }
+                }
+            )
+        }
     }
 }

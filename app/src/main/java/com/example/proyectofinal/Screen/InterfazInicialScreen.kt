@@ -1,5 +1,6 @@
 package com.example.proyectofinal
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -26,6 +27,9 @@ fun InterfazInicialScreen(navController: NavController) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    BackHandler(enabled = drawerState.isClosed) {
+        // Acción vacía para deshabilitar el botón de retroceso
+    }
     val onNavigate: (String) -> Unit = { route ->
         navController.navigate(route)
         scope.launch { drawerState.close() }
@@ -127,5 +131,4 @@ fun InterfazInicialScreen(navController: NavController) {
 
         )
     }
-
 }

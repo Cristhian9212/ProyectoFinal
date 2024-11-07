@@ -1,5 +1,7 @@
 package com.example.proyectofinal
 
+import androidx.activity.compose.BackHandler
+import android.os.Process
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -41,7 +43,10 @@ fun LoginScreen(
     var contrasena by remember { mutableStateOf(TextFieldValue("")) }
     var contrasenaVisible by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") } // Estado para el mensaje de error
-
+    BackHandler {
+        // Finaliza la aplicación al presionar el botón de retroceso
+        Process.killProcess(Process.myPid())
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -162,7 +167,8 @@ fun LoginScreen(
                                     if (usuarioResult != null) {
                                         onLoginSuccess(usuarioResult)
                                         navController.navigate("interfaz_inicial") {
-                                            popUpTo("interfaz_inicial") { inclusive = true }
+                                            popUpTo("login") { inclusive = true } // Esto eliminará la pantalla de inicio de sesión del historial de navegación
+                                            launchSingleTop = true // Evita duplicados de la pantalla principal en el stack
                                         }
                                     } else {
                                         errorMessage = "Credenciales incorrectas"

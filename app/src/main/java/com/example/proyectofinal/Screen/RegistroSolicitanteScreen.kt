@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -13,11 +14,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.proyectofinal.Model.Solicitante
+import com.example.proyectofinal.Model.Usuario
 import com.example.proyectofinal.Repository.UsuarioRepository
 import com.example.proyectofinal.Screen.DrawerContent
 import kotlinx.coroutines.launch
@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 fun RegistroSolicitanteScreen(
     navController: NavController,
     usuarioRepository: UsuarioRepository,
-    onSaveEquipo: (String, String, String, String, Int) -> Unit // Añadimos `creadoPor` como parámetro
+    onSaveEquipo: suspend (String, String, String, String, Int) -> Unit // Cambiar aquí a suspend
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -38,16 +38,22 @@ fun RegistroSolicitanteScreen(
     var correo by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
 
-    // Variables de estado para el login del usuario
-    var nombreUsuario by remember { mutableStateOf("") }
-    var contrasena by remember { mutableStateOf("") }
+    // Variables para el idUsuario
     var idUsuario by remember { mutableStateOf<Int?>(null) }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedUsuario by remember { mutableStateOf<Usuario?>(null) }
 
-    // Lógica para autenticar usuario y obtener `creadoPor`
-    LaunchedEffect(Unit) {
-        val usuario = usuarioRepository.login(nombreUsuario, contrasena)
-        idUsuario = usuario?.idUsuario
+    // Lista de usuarios que se actualizará una vez obtenida
+    val usuarios = remember { mutableStateOf<List<Usuario>>(emptyList()) }
+
+    // Llamada suspendida para obtener los usuarios
+    LaunchedEffect(true) {
+        // Obtener usuarios dentro de la corrutina
+        usuarios.value = usuarioRepository.obtenerTodosUsuarios()
     }
+
+    // Mostrar idUsuario cuando esté seleccionado
+    val idUsuarioSeleccionado = selectedUsuario?.idUsuario
 
     ModalNavigationDrawer(
         drawerContent = {
@@ -118,37 +124,44 @@ fun RegistroSolicitanteScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    // Login Form
+                    // Dropdown para seleccionar idUsuario
+                    Text("ID Usuario:")
                     OutlinedTextField(
-                        value = nombreUsuario,
-                        onValueChange = { nombreUsuario = it },
-                        label = { Text("Nombre de Usuario") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    OutlinedTextField(
-                        value = contrasena,
-                        onValueChange = { contrasena = it },
-                        label = { Text("Contraseña") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Button(
-                        onClick = {
-                            scope.launch {
-                                val usuario = usuarioRepository.login(nombreUsuario, contrasena)
-                                idUsuario = usuario?.idUsuario
+                        value = selectedUsuario?.let { "${it.nombres} ${it.apellidos}" }?: "",
+                        onValueChange = {},
+                        label = { Text("Seleccionar Usuario") },
+                        modifier = Modifier.fillMaxWidth(),
+                        readOnly = true,
+                        trailingIcon = {
+                            IconButton(onClick = { expanded = !expanded }) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowDropDown,
+                                    contentDescription = "Desplegar opciones"
+                                )
                             }
                         }
+                    )
+
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
                     ) {
-                        Text("Iniciar Sesión")
+                        // Mostrar lista de usuarios solo si está disponible
+                        usuarios.value.forEach { usuario ->
+                            DropdownMenuItem(
+                                text = { Text("${usuario.nombres} ${usuario.apellidos}") },
+                                onClick = {
+                                    selectedUsuario = usuario
+                                    idUsuario = usuario.idUsuario
+                                    expanded = false
+                                }
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // Registro Form
+                    // Formulario de registro
                     OutlinedTextField(
                         value = nombre,
                         onValueChange = { nombre = it },
@@ -184,7 +197,17 @@ fun RegistroSolicitanteScreen(
                     Button(
                         onClick = {
                             idUsuario?.let { idUsuario ->
-                                onSaveEquipo(nombre, apellido, correo, telefono, idUsuario)
+                                // Llamada para guardar los datos
+                                scope.launch {
+                                    onSaveEquipo(nombre, apellido, correo, telefono, idUsuario)
+                                    // Limpiar los campos después de guardar
+                                    nombre = ""
+                                    apellido = ""
+                                    correo = ""
+                                    telefono = ""
+                                    selectedUsuario = null
+
+                                }
                             }
                         }
                     ) {
