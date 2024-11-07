@@ -137,5 +137,8 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
                 }
             )
         }
+        composable("interfaz-listar") {
+            ListarScreen(navController = navController) // Pasar el navController aquí
+        }
     }
 }

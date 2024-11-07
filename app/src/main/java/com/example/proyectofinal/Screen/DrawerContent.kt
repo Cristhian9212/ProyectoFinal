@@ -285,10 +285,10 @@ fun DrawerContent(onNavigate: (String) -> Unit) {
                     )
                     Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el ícono y el texto
                     TextButton(
-                        onClick = { /* Navegar a Sección 1 */ },
+                        onClick = { onNavigate("interfaz-listar") },
                         colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF2AA345))
                     ) {
-                        Text(text = "Registro extendido")
+                        Text(text = "Validacion de registros")
                     }
                 }
             }
