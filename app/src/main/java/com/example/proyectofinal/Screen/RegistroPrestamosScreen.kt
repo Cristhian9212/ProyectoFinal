@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.proyectofinal.Repository.PrestamoRepository
 import com.example.proyectofinal.Screen.DrawerContent
 import kotlinx.coroutines.launch
 import java.util.*
@@ -40,17 +41,16 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistroPrestamosScreen
-            (navController: NavController, onSaveEquipo: (Int, Int, String, String, String) -> Unit
+            (navController: NavController,
+             prestamoRepository: PrestamoRepository,
+             onSaveEquipo: (Int, Int, String, String, String) -> Unit
 ) {
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    // Variables para los IDs de solicitante y computador
     var idSolicitante by remember { mutableStateOf("") }
     var idComputador by remember { mutableStateOf("") }
-
-    // Variables para las fechas
     var fechaPrestamo by remember { mutableStateOf("") }
     var fechaDevolucion by remember { mutableStateOf("") }
     var fechaDevuelta by remember { mutableStateOf("") }
