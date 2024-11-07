@@ -121,7 +121,8 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
         composable("registro-prestamo") {
             RegistroPrestamosScreen(
                 navController = navController,
-                prestamoRepository = prestamoRepository, // Aquí lo pasas correctamente
+                solicitanteRepository = SolicitanteRepository,
+                computadorRepository = ComputadorRepository,
                 onSaveEquipo = { idSolicitante, idComputador, fechaPrestamo, fechaDevolucion, fechaDevuelta ->
                     val nuevoPrestamo = Prestamo(
                         idSolicitante = idSolicitante,

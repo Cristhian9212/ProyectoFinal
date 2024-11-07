@@ -7,13 +7,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -33,40 +38,50 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.proyectofinal.Model.Computador
+import com.example.proyectofinal.Model.Solicitante
+import com.example.proyectofinal.Model.Usuario
+import com.example.proyectofinal.Repository.ComputadorRepository
 import com.example.proyectofinal.Repository.PrestamoRepository
+import com.example.proyectofinal.Repository.SolicitanteRepository
 import com.example.proyectofinal.Screen.DrawerContent
 import kotlinx.coroutines.launch
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistroPrestamosScreen
-            (navController: NavController,
-             prestamoRepository: PrestamoRepository,
-             onSaveEquipo: (Int, Int, String, String, String) -> Unit
+fun RegistroPrestamosScreen(
+    navController: NavController,
+    solicitanteRepository: SolicitanteRepository,
+    computadorRepository: ComputadorRepository,
+    onSaveEquipo: (Int, Int, String, String, String) -> Unit
 ) {
-
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    var idSolicitante by remember { mutableStateOf("") }
-    var idComputador by remember { mutableStateOf("") }
     var fechaPrestamo by remember { mutableStateOf("") }
     var fechaDevolucion by remember { mutableStateOf("") }
     var fechaDevuelta by remember { mutableStateOf("") }
+
+    var idSolicitante by remember { mutableStateOf<Int?>(null) }
+    var expandedSolicitante by remember { mutableStateOf(false) }
+    var selectedSolicitante by remember { mutableStateOf<Solicitante?>(null) }
+
+    var idComputador by remember { mutableStateOf<Int?>(null) }
+    var expandedComputador by remember { mutableStateOf(false) }
+    var selectedComputador by remember { mutableStateOf<Computador?>(null) }
+
+    val solicitantes = remember { mutableStateOf<List<Solicitante>>(emptyList()) }
+    val computadores = remember { mutableStateOf<List<Computador>>(emptyList()) }
 
     // Estados para mostrar los DatePickerDialog
     var isDatePickerVisiblePrestamo by remember { mutableStateOf(false) }
     var isDatePickerVisibleDevolucion by remember { mutableStateOf(false) }
     var isDatePickerVisibleDevuelta by remember { mutableStateOf(false) }
 
-    BackHandler(enabled = drawerState.isClosed) {
-        // Acción vacía para deshabilitar el botón de retroceso
-    }
-
-    val onNavigate: (String) -> Unit = { route ->
-        navController.navigate(route)
-        scope.launch { drawerState.close() }
+    LaunchedEffect(true) {
+        solicitantes.value = solicitanteRepository.obtenerTodosSolicitantes()
+        computadores.value = computadorRepository.obtenerTodosLosComputadores()
     }
 
     ModalNavigationDrawer(
@@ -78,7 +93,10 @@ fun RegistroPrestamosScreen
                         .width(300.dp)
                         .background(Color.White)
                 ) {
-                    DrawerContent(onNavigate)
+                    DrawerContent { route ->
+                        navController.navigate(route)
+                        scope.launch { drawerState.close() }
+                    }
                 }
             }
         },
@@ -127,148 +145,229 @@ fun RegistroPrestamosScreen
                 }
             },
             content = { paddingValues ->
-                Box(
-                    modifier = Modifier.fillMaxSize()
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(horizontal = 32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    // Imagen de fondo
-                    val backgroundImage: Painter = painterResource(id = R.drawable.fondoprincipal)
-                    Image(
-                        painter = backgroundImage,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
+                    // Dropdown para seleccionar el solicitante
+                    Text("Solicitante:")
+                    OutlinedTextField(
+                        value = selectedSolicitante?.let { "${it.nombre} ${it.apellido}" } ?: "",
+                        onValueChange = {},
+                        label = { Text("Seleccionar Solicitante") },
+                        modifier = Modifier.fillMaxWidth(),
+                        readOnly = true,
+                        trailingIcon = {
+                            IconButton(onClick = { expandedSolicitante = !expandedSolicitante }) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowDropDown,
+                                    contentDescription = "Desplegar opciones"
+                                )
+                            }
+                        }
                     )
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.White.copy(alpha = 0.6f))
-                    )
-
-                    // Contenido en primer plano
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                    DropdownMenu(
+                        expanded = expandedSolicitante,
+                        onDismissRequest = { expandedSolicitante = false }
                     ) {
-                        // Campo para el ID del solicitante
-                        TextField(
-                            value = idSolicitante,
-                            onValueChange = { idSolicitante = it },
-                            label = { Text("ID del Solicitante", color = Color.Black.copy(alpha = 0.8f)) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        // Campo para el ID del computador
-                        TextField(
-                            value = idComputador,
-                            onValueChange = { idComputador = it },
-                            label = { Text("ID del Computador", color = Color.Black.copy(alpha = 0.8f)) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        // Campo para la fecha de préstamo
-                        TextField(
-                            value = fechaPrestamo,
-                            onValueChange = { fechaPrestamo = it },
-                            label = { Text("Fecha de Préstamo", color = Color.Black.copy(alpha = 0.8f)) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                            trailingIcon = {
-                                IconButton(onClick = { isDatePickerVisiblePrestamo = true }) {
-                                    Icon(
-                                        imageVector = Icons.Filled.DateRange,
-                                        contentDescription = "Seleccionar fecha de préstamo",
-                                        tint = Color.Gray
-                                    )
+                        solicitantes.value.forEach { solicitante ->
+                            DropdownMenuItem(
+                                text = { Text("${solicitante.nombre} ${solicitante.apellido}") },
+                                onClick = {
+                                    selectedSolicitante = solicitante
+                                    idSolicitante = solicitante.idSolicitante
+                                    expandedSolicitante = false
                                 }
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        // Muestra el DatePickerDialog si isDatePickerVisiblePrestamo es verdadero
-                        if (isDatePickerVisiblePrestamo) {
-                            val calendar = Calendar.getInstance()
-                            DatePickerDialog(
-                                LocalContext.current,
-                                { _, year, month, dayOfMonth ->
-                                    fechaPrestamo = String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year)
-                                    isDatePickerVisiblePrestamo = false
-                                },
-                                calendar.get(Calendar.YEAR),
-                                calendar.get(Calendar.MONTH),
-                                calendar.get(Calendar.DAY_OF_MONTH)
-                            ).show()
+                            )
                         }
+                    }
 
-                        // Campo para la fecha de devolución
-                        TextField(
-                            value = fechaDevolucion,
-                            onValueChange = { fechaDevolucion = it },
-                            label = { Text("Fecha de Devolución", color = Color.Black.copy(alpha = 0.8f)) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                            trailingIcon = {
-                                IconButton(onClick = { isDatePickerVisibleDevolucion = true }) {
-                                    Icon(
-                                        imageVector = Icons.Filled.DateRange,
-                                        contentDescription = "Seleccionar fecha de devolución",
-                                        tint = Color.Gray
-                                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // Dropdown para seleccionar el computador
+                    Text("Computador:")
+                    OutlinedTextField(
+                        value = selectedComputador?.let { it.marca } ?: "",
+                        onValueChange = {},
+                        label = { Text("Seleccionar Computador") },
+                        modifier = Modifier.fillMaxWidth(),
+                        readOnly = true,
+                        trailingIcon = {
+                            IconButton(onClick = { expandedComputador = !expandedComputador }) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowDropDown,
+                                    contentDescription = "Desplegar opciones"
+                                )
+                            }
+                        }
+                    )
+
+                    DropdownMenu(
+                        expanded = expandedComputador,
+                        onDismissRequest = { expandedComputador = false }
+                    ) {
+                        computadores.value.forEach { computador ->
+                            DropdownMenuItem(
+                                text = { Text(computador.marca) },
+                                onClick = {
+                                    selectedComputador = computador
+                                    idComputador = computador.idComputador
+                                    expandedComputador = false
                                 }
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        // Muestra el DatePickerDialog si isDatePickerVisibleDevolucion es verdadero
-                        if (isDatePickerVisibleDevolucion) {
-                            val calendar = Calendar.getInstance()
-                            DatePickerDialog(
-                                LocalContext.current,
-                                { _, year, month, dayOfMonth ->
-                                    fechaDevolucion = String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year)
-                                    isDatePickerVisibleDevolucion = false
-                                },
-                                calendar.get(Calendar.YEAR),
-                                calendar.get(Calendar.MONTH),
-                                calendar.get(Calendar.DAY_OF_MONTH)
-                            ).show()
+                            )
                         }
+                    }
 
-                        // Campo para la fecha devuelta
-                        TextField(
-                            value = fechaDevuelta,
-                            onValueChange = { fechaDevuelta = it },
-                            label = { Text("Fecha Real de Devolución", color = Color.Black.copy(alpha = 0.8f)) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                            trailingIcon = {
-                                IconButton(onClick = { isDatePickerVisibleDevuelta = true }) {
-                                    Icon(
-                                        imageVector = Icons.Filled.DateRange,
-                                        contentDescription = "Seleccionar fecha devuelta",
-                                        tint = Color.Gray
-                                    )
-                                }
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // Campo para la fecha de préstamo
+                    TextField(
+                        value = fechaPrestamo,
+                        onValueChange = { fechaPrestamo = it },
+                        label = {
+                            Text(
+                                "Fecha de Préstamo",
+                                color = Color.Black.copy(alpha = 0.8f)
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        trailingIcon = {
+                            IconButton(onClick = { isDatePickerVisiblePrestamo = true }) {
+                                Icon(
+                                    imageVector = Icons.Filled.DateRange,
+                                    contentDescription = "Seleccionar fecha de préstamo",
+                                    tint = Color.Gray
+                                )
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // Muestra el DatePickerDialog si isDatePickerVisiblePrestamo es verdadero
+                    if (isDatePickerVisiblePrestamo) {
+                        val calendar = Calendar.getInstance()
+                        DatePickerDialog(
+                            LocalContext.current,
+                            { _, year, month, dayOfMonth ->
+                                fechaPrestamo =
+                                    String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year)
+                                isDatePickerVisiblePrestamo = false
                             },
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                            calendar.get(Calendar.YEAR),
+                            calendar.get(Calendar.MONTH),
+                            calendar.get(Calendar.DAY_OF_MONTH)
+                        ).show()
+                    }
 
-                        // Muestra el DatePickerDialog si isDatePickerVisibleDevuelta es verdadero
-                        if (isDatePickerVisibleDevuelta) {
-                            val calendar = Calendar.getInstance()
-                            DatePickerDialog(
-                                LocalContext.current,
-                                { _, year, month, dayOfMonth ->
-                                    fechaDevuelta = String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year)
-                                    isDatePickerVisibleDevuelta = false
-                                },
-                                calendar.get(Calendar.YEAR),
-                                calendar.get(Calendar.MONTH),
-                                calendar.get(Calendar.DAY_OF_MONTH)
-                            ).show()
-                        }
+                    // Campo para la fecha de devolución
+                    TextField(
+                        value = fechaDevolucion,
+                        onValueChange = { fechaDevolucion = it },
+                        label = {
+                            Text(
+                                "Fecha de Devolución",
+                                color = Color.Black.copy(alpha = 0.8f)
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        trailingIcon = {
+                            IconButton(onClick = { isDatePickerVisibleDevolucion = true }) {
+                                Icon(
+                                    imageVector = Icons.Filled.DateRange,
+                                    contentDescription = "Seleccionar fecha de devolución",
+                                    tint = Color.Gray
+                                )
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // Muestra el DatePickerDialog si isDatePickerVisibleDevolucion es verdadero
+                    if (isDatePickerVisibleDevolucion) {
+                        val calendar = Calendar.getInstance()
+                        DatePickerDialog(
+                            LocalContext.current,
+                            { _, year, month, dayOfMonth ->
+                                fechaDevolucion =
+                                    String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year)
+                                isDatePickerVisibleDevolucion = false
+                            },
+                            calendar.get(Calendar.YEAR),
+                            calendar.get(Calendar.MONTH),
+                            calendar.get(Calendar.DAY_OF_MONTH)
+                        ).show()
+                    }
+
+                    // Campo para la fecha de devolución real
+                    TextField(
+                        value = fechaDevuelta,
+                        onValueChange = { fechaDevuelta = it },
+                        label = {
+                            Text(
+                                "Fecha de Devolución Real",
+                                color = Color.Black.copy(alpha = 0.8f)
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        trailingIcon = {
+                            IconButton(onClick = { isDatePickerVisibleDevuelta = true }) {
+                                Icon(
+                                    imageVector = Icons.Filled.DateRange,
+                                    contentDescription = "Seleccionar fecha de devolución real",
+                                    tint = Color.Gray
+                                )
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // Muestra el DatePickerDialog si isDatePickerVisibleDevuelta es verdadero
+                    if (isDatePickerVisibleDevuelta) {
+                        val calendar = Calendar.getInstance()
+                        DatePickerDialog(
+                            LocalContext.current,
+                            { _, year, month, dayOfMonth ->
+                                fechaDevuelta =
+                                    String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year)
+                                isDatePickerVisibleDevuelta = false
+                            },
+                            calendar.get(Calendar.YEAR),
+                            calendar.get(Calendar.MONTH),
+                            calendar.get(Calendar.DAY_OF_MONTH)
+                        ).show()
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Button(
+                        onClick = {
+                            if (idSolicitante != null && idComputador != null) {
+                                onSaveEquipo(
+                                    idSolicitante!!,
+                                    idComputador!!,
+                                    fechaPrestamo,
+                                    fechaDevolucion,
+                                    fechaDevuelta
+                                )
+
+                                // Limpiar los campos después de guardar la información
+                                fechaPrestamo = ""
+                                fechaDevolucion = ""
+                                fechaDevuelta = ""
+                                idSolicitante = null
+                                idComputador = null
+                                selectedSolicitante = null
+                                selectedComputador = null
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = "Registrar Préstamo")
                     }
                 }
             }

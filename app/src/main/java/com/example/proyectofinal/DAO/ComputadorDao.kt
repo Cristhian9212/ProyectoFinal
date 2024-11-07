@@ -16,4 +16,9 @@ interface ComputadorDao {
 
     @Query("UPDATE computadores SET estado = :estado WHERE idComputador = :idComputador")
     suspend fun actualizarEstado(idComputador: Int, estado: String)
+
+    // Nuevo método para listar todos los computadores
+    @Query("SELECT * FROM computadores")
+    suspend fun obtenerTodosLosComputadores(): List<Computador>
 }
+

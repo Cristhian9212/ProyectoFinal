@@ -15,4 +15,9 @@ class ComputadorRepository(private val computadorDao: ComputadorDao) {
     suspend fun actualizarEstado(idComputador: Int, estado: String) {
         computadorDao.actualizarEstado(idComputador, estado)
     }
+
+    // Nuevo método para obtener todos los computadores
+    suspend fun obtenerTodosLosComputadores(): List<Computador> {
+        return computadorDao.obtenerTodosLosComputadores()
+    }
 }
