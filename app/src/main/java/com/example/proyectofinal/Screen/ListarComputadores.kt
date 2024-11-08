@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListarScreen(navController: NavController) {
+fun ListarComputadores(navController: NavController) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -40,7 +40,7 @@ fun ListarScreen(navController: NavController) {
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(300.dp)
+                        .width(300.dp) // Define el ancho del Drawer
                         .background(Color.White)
                 ) {
                     DrawerContent(onNavigate)
@@ -48,7 +48,7 @@ fun ListarScreen(navController: NavController) {
             }
         },
         drawerState = drawerState,
-        gesturesEnabled = true
+        gesturesEnabled = true // Permite que se cierre tocando fuera del Drawer
     ) {
         Scaffold(
             topBar = {
@@ -95,110 +95,40 @@ fun ListarScreen(navController: NavController) {
                 Box(
                     modifier = Modifier.fillMaxSize()
                 ) {
+                    // Imagen de fondo
                     val backgroundImage: Painter = painterResource(id = R.drawable.fondoprincipal)
                     Image(
                         painter = backgroundImage,
                         contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize(),
                         contentScale = ContentScale.Crop
+
                     )
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color.White.copy(alpha = 0.6f))
+                            .background(Color.White.copy(alpha = 0.6f)) // Cambia la opacidad según sea necesario
                     )
 
+                    // Contenido en primer plano
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(paddingValues)
-                            .padding(16.dp),
+                            .padding(paddingValues),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Interfaz para listar",
+                            text = "ACA SE VA A LISTAR LOS COMPUTADORES",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onBackground
+                            color = MaterialTheme.colorScheme.onBackground // Asegura que el texto se vea bien sobre el fondo
                         )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Primera tarjeta
-                        OutlinedCard(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                        ) {
-                            TextButton(
-                                onClick = {onNavigate("interfaz-listarusuarios") },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = "Listado de usuarios",
-                                    fontSize = 16.sp,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
-
-                        // Segunda tarjeta
-                        OutlinedCard(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                        ) {
-                            TextButton(
-                                onClick = { onNavigate("interfaz-listarestudiantes") },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = "Listado de estudiantes",
-                                    fontSize = 16.sp,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
-
-                        // Tercera tarjeta
-                        OutlinedCard(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                        ) {
-                            TextButton(
-                                onClick = { onNavigate("interfaz-listarcomputadores" )},
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = "Listado de computadores",
-                                    fontSize = 16.sp,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
-
-                        // Cuarta tarjeta
-                        OutlinedCard(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                        ) {
-                            TextButton(
-                                onClick = { onNavigate("interfaz-listarprestamos")},
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = "Listado de prestamos",
-                                    fontSize = 16.sp,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
                     }
                 }
             }
+
         )
     }
 }

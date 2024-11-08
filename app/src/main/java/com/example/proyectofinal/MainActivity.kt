@@ -140,5 +140,17 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
         composable("interfaz-listar") {
             ListarScreen(navController = navController) // Pasar el navController aquí
         }
+        composable("interfaz-listarusuarios") {
+        listarUsuarios(navController = navController) // Pasar el navController aquí
+        }
+        composable("interfaz-listarestudiantes") {
+            ListarSolicitantes(navController = navController) // Pasar el navController aquí
+        }
+        composable("interfaz-listarcomputadores") {
+            ListarComputadores(navController = navController) // Pasar el navController aquí
+        }
+        composable("interfaz-listarprestamos") {
+            ListarPrestamos(navController = navController) // Pasar el navController aquí
+        }
     }
 }
