@@ -22,31 +22,40 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.proyectofinal.Model.Solicitante
+import com.example.proyectofinal.Model.SolicitanteConUsuario
+import com.example.proyectofinal.Model.Usuario
 import com.example.proyectofinal.Repository.SolicitanteRepository
+import com.example.proyectofinal.Repository.UsuarioRepository
 import com.example.proyectofinal.Screen.DrawerContent
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListarSolicitantes(navController: NavController, solicitanteRepository: SolicitanteRepository) {
+fun ListarSolicitantes(
+    navController: NavController,
+    solicitanteRepository: SolicitanteRepository,
+    usuarioRepository: UsuarioRepository
+) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    var solicitantes by remember { mutableStateOf(listOf<Solicitante>()) }
-    var solicitanteAEditar by remember { mutableStateOf<Solicitante?>(null) }
+    var solicitantesConUsuarios by remember { mutableStateOf(listOf<SolicitanteConUsuario>()) }
+    var usuariosDisponibles by remember { mutableStateOf(listOf<Usuario>()) } // Lista de usuarios para el Dropdown
+    var solicitanteAEditar by remember { mutableStateOf<SolicitanteConUsuario?>(null) }
     var mostrarDialogoEditar by remember { mutableStateOf(false) }
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
+    var idUsuarioSeleccionado by remember { mutableStateOf<Int?>(null) } // ID seleccionado en el Dropdown
 
+    // Cargar los solicitantes y usuarios disponibles
     LaunchedEffect(Unit) {
-        solicitantes = solicitanteRepository.obtenerTodosSolicitantes()
+        solicitantesConUsuarios = solicitanteRepository.obtenerSolicitantesConUsuarios()
+        usuariosDisponibles = usuarioRepository.obtenerTodosUsuarios()// Asume que esto devuelve la lista de usuarios
     }
 
     BackHandler(enabled = drawerState.isClosed) {}
-
     val onNavigate: (String) -> Unit = { route ->
         navController.navigate(route)
         scope.launch { drawerState.close() }
@@ -127,7 +136,10 @@ fun ListarSolicitantes(navController: NavController, solicitanteRepository: Soli
                             .padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        items(solicitantes) { solicitante ->
+                        items(solicitantesConUsuarios) { solicitanteConUsuario ->
+                            val solicitante = solicitanteConUsuario.solicitante
+                            val usuario = solicitanteConUsuario.usuario
+
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -152,8 +164,12 @@ fun ListarSolicitantes(navController: NavController, solicitanteRepository: Soli
                                         text = "Teléfono: ${solicitante.telefono}",
                                         fontSize = 14.sp
                                     )
+                                    Text(
+                                        text = "Usuario Asignado: ${usuario.nombres} ${usuario.apellidos}",
+                                        fontSize = 14.sp,
+                                        color = Color.Gray
+                                    )
 
-                                    // Row for edit/delete icons
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -166,12 +182,12 @@ fun ListarSolicitantes(navController: NavController, solicitanteRepository: Soli
                                             modifier = Modifier
                                                 .size(24.dp)
                                                 .clickable {
-                                                    // Set the fields to the current solicitante's info
-                                                    solicitanteAEditar = solicitante
+                                                    solicitanteAEditar = solicitanteConUsuario
                                                     nombre = solicitante.nombre
                                                     apellido = solicitante.apellido
                                                     correo = solicitante.correo
                                                     telefono = solicitante.telefono
+                                                    idUsuarioSeleccionado = usuario.idUsuario // Asignar el idUsuario actual
                                                     mostrarDialogoEditar = true
                                                 },
                                             tint = Color.Blue
@@ -185,7 +201,7 @@ fun ListarSolicitantes(navController: NavController, solicitanteRepository: Soli
                                                 .clickable {
                                                     scope.launch {
                                                         solicitanteRepository.eliminar(solicitante)
-                                                        solicitantes = solicitanteRepository.obtenerTodosSolicitantes()
+                                                        solicitantesConUsuarios = solicitanteRepository.obtenerSolicitantesConUsuarios()
                                                     }
                                                 },
                                             tint = Color.Red
@@ -196,7 +212,6 @@ fun ListarSolicitantes(navController: NavController, solicitanteRepository: Soli
                         }
                     }
 
-                    // Edit dialog
                     if (mostrarDialogoEditar && solicitanteAEditar != null) {
                         AlertDialog(
                             onDismissRequest = { mostrarDialogoEditar = false },
@@ -224,20 +239,58 @@ fun ListarSolicitantes(navController: NavController, solicitanteRepository: Soli
                                         onValueChange = { telefono = it },
                                         label = { Text("Teléfono") }
                                     )
+                                    // Dropdown menu para seleccionar usuario
+                                    var expanded by remember { mutableStateOf(false) }
+                                    Box(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+                                        Text(
+                                            text = usuariosDisponibles.find { it.idUsuario == idUsuarioSeleccionado }
+                                                ?.let { "${it.nombres} ${it.apellidos}" } ?: "Seleccionar Usuario",
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clickable { expanded = true }
+                                                .padding(8.dp)
+                                                .background(Color.LightGray)
+                                        )
+                                        DropdownMenu(
+                                            expanded = expanded,
+                                            onDismissRequest = { expanded = false }
+                                        ) {
+                                            usuariosDisponibles.forEach { usuario ->
+                                                DropdownMenuItem(
+                                                    text = { Text("${usuario.nombres} ${usuario.apellidos}") },
+                                                    onClick = {
+                                                        idUsuarioSeleccionado = usuario.idUsuario
+                                                        expanded = false
+                                                    }
+                                                )
+                                            }
+                                        }
+                                    }
+
                                 }
                             },
                             confirmButton = {
                                 Button(onClick = {
-                                    val solicitanteModificado = solicitanteAEditar?.copy(
+                                    // Actualizamos `Solicitante` con los nuevos datos del formulario
+                                    val solicitanteModificado = solicitanteAEditar?.solicitante?.copy(
                                         nombre = nombre,
                                         apellido = apellido,
                                         correo = correo,
                                         telefono = telefono
                                     )
-                                    solicitanteModificado?.let {
+                                    // Actualizamos `Usuario` en caso de que el usuario seleccionado haya cambiado
+                                    val usuarioModificado = solicitanteAEditar?.usuario?.copy(
+                                        idUsuario = idUsuarioSeleccionado ?: 0 // Utilizamos el idUsuario seleccionado
+                                    )
+
+                                    if (solicitanteModificado != null && usuarioModificado != null) {
                                         scope.launch {
-                                            solicitanteRepository.actualizar(it)
-                                            solicitantes = solicitanteRepository.obtenerTodosSolicitantes()
+                                            // Intentamos actualizar tanto el solicitante como el usuario
+                                            solicitanteRepository.actualizar(solicitanteModificado)
+                                            usuarioRepository.actualizar(usuarioModificado) // Solo si necesitas actualizar también el usuario
+
+                                            // Recargar la lista completa para reflejar los cambios en la interfaz
+                                            solicitantesConUsuarios = solicitanteRepository.obtenerSolicitantesConUsuarios()
                                         }
                                     }
                                     mostrarDialogoEditar = false

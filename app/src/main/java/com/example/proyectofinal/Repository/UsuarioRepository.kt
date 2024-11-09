@@ -16,5 +16,4 @@ class UsuarioRepository(private val usuarioDao: UsuarioDao) {
 
     // Nueva función para eliminar un usuario
     suspend fun eliminar(usuario: Usuario) = usuarioDao.eliminar(usuario)
-
 }
