@@ -11,4 +11,12 @@ class SolicitanteRepository(private val solicitanteDao: SolicitanteDao) {
     suspend fun obtenerTodosSolicitantes(): List<Solicitante> {
         return solicitanteDao.obtenerTodosSolicitantes()
     }
+
+    suspend fun actualizar(solicitante: Solicitante) {
+        solicitanteDao.actualizar(solicitante)
+    }
+
+    suspend fun eliminar(solicitante: Solicitante) {
+        solicitanteDao.eliminar(solicitante)
+    }
 }
