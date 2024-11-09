@@ -13,6 +13,8 @@ androidx-room = "2.5.0"
 ksp = "1.9.0-1.0.13"
 navigationRuntimeKtx = "2.8.2"
 navigationCompose = "2.8.2"
+testng = "6.9.6"
+playServicesPhenotype = "17.0.0"
 
 
 [libraries]
@@ -36,6 +38,8 @@ androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = 
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "androidx-room"}
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+testng = { group = "org.testng", name = "testng", version.ref = "testng" }
+play-services-phenotype = { group = "com.google.android.gms", name = "play-services-phenotype", version.ref = "playServicesPhenotype" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
