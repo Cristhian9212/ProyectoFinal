@@ -1,7 +1,10 @@
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -14,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -30,6 +34,9 @@ import kotlinx.coroutines.launch
 fun InterfazInicialScreen(navController: NavController) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
+    // Obtener el contexto fuera del bloque clickable
+    val context = LocalContext.current
 
     BackHandler(enabled = drawerState.isClosed) {
         // Acción vacía para deshabilitar el botón de retroceso
@@ -103,42 +110,39 @@ fun InterfazInicialScreen(navController: NavController) {
                         .fillMaxSize()
                         .padding(paddingValues) // Aplica el padding del Scaffold
                 ) {
-                    // Imagen de fondo
                     val backgroundImage: Painter = painterResource(id = R.drawable.fondoprincipal)
                     Image(
                         painter = backgroundImage,
                         contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxSize(),
+                        modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color.White.copy(alpha = 0.6f)) // Cambia la opacidad según sea necesario
+                            .background(Color.White.copy(alpha = 0.6f))
                     )
 
-                    // Contenido en primer plano
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(top = 32.dp), // Aquí agregas un espacio desde la parte superior
+                            .padding(top = 32.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
                             text = "Bienvenido",
-                            fontSize = 48.sp, // Aumenta el tamaño del título
+                            fontSize = 48.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.Black
                         )
                         Text(
                             text = "Plataforma de gestión de préstamos",
-                            fontSize = 25.sp, // Subtítulo más pequeño
+                            fontSize = 25.sp,
                             fontWeight = FontWeight.Medium,
                             color = Color.Black
                         )
-                        // Lista de imágenes y textos asociados
+
                         val images = listOf(
                             R.drawable.iniciovertical1,
                             R.drawable.iniciovertical2,
@@ -155,10 +159,14 @@ fun InterfazInicialScreen(navController: NavController) {
                                     "Desde Bienestar Universitario extendemos la invitación a participar en la encuesta de identificación de necesidades que hemos construido con el objetivo de conocer de manera más precisa sus necesidades y expectativas en relación con los servicios, programas y espacios para el fortalecimiento de la calidad de vida, hábitos saludables y formación para la vida."
                         )
 
-                        // Estado para controlar la imagen y el texto actual
+                        val urls = listOf(
+                            "https://www.ucundinamarca.edu.co/documents/varios/2024/Infografia-PSE-2025-1.pdf",
+                            "https://www.ucundinamarca.edu.co/index.php/convocatorias-laborales",
+                            "https://forms.office.com/Pages/ResponsePage.aspx?id=oGfaB0MfjE6Xf1-ItkcO5qRKry4dtgRHtDDDJ8l-MdZUMVRUNjlNWFY3WVNTRjhUQjJNQUk5T0I2Si4u&origin=QRCode"
+                        )
+
                         var currentIndex by remember { mutableStateOf(0) }
 
-                        // Cambiar imagen y texto cada 10 segundos
                         LaunchedEffect(Unit) {
                             while (true) {
                                 delay(10000) // 10 segundos
@@ -166,10 +174,8 @@ fun InterfazInicialScreen(navController: NavController) {
                             }
                         }
 
-                        // Detectar la orientación de la pantalla
                         val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
 
-                        // Elegir imagen según la orientación
                         val selectedImage = if (isPortrait) {
                             listOf(R.drawable.iniciovertical1, R.drawable.iniciovertical2, R.drawable.iniciovertical3)
                         } else {
@@ -181,28 +187,77 @@ fun InterfazInicialScreen(navController: NavController) {
                             contentPadding = PaddingValues(16.dp)
                         ) {
                             item {
-                                // Mostrar la imagen actual
                                 Image(
                                     painter = painterResource(id = selectedImage[currentIndex]),
                                     contentDescription = null,
                                     modifier = Modifier
                                         .padding(4.dp)
-                                        .height(300.dp) // Las imágenes tienen el mismo tamaño
+                                        .height(300.dp)
                                         .fillMaxWidth(),
                                     contentScale = ContentScale.Crop
                                 )
 
-                                // Cuadro de texto con la descripción justificada
                                 Text(
                                     text = descriptions[currentIndex],
-                                    fontSize = 20.sp, // Aumenta el tamaño del texto
+                                    fontSize = 20.sp,
                                     fontWeight = FontWeight.Normal,
                                     color = MaterialTheme.colorScheme.onBackground,
-                                    textAlign = TextAlign.Justify, // Justifica el texto
+                                    textAlign = TextAlign.Justify,
                                     modifier = Modifier
                                         .padding(16.dp)
                                         .background(Color.White.copy(alpha = 0.5f), shape = MaterialTheme.shapes.medium)
-                                        .padding(8.dp) // Padding dentro del cuadro de texto
+                                        .padding(8.dp)
+                                )
+                                // Imagen adicional que cambia cada 10 segundos
+                                val additionalImages = listOf(
+                                    R.drawable.inicio1,
+                                    R.drawable.inicio2,
+                                    R.drawable.inicio3)
+
+                                var additionalIndex by remember { mutableStateOf(0) }
+
+                                // Cambiar imagen cada 10 segundos
+                                LaunchedEffect(Unit) {
+                                    while (true) {
+                                        delay(10000) // 10 segundos
+                                        additionalIndex = (additionalIndex + 1) % additionalImages.size
+                                    }
+                                }
+
+                                Text(
+                                    text = "Para más información escanea el código QR.",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    textAlign = TextAlign.Justify,
+                                    modifier = Modifier
+                                        .background(Color.White.copy(alpha = 0.5f), shape = MaterialTheme.shapes.medium)
+                                        .padding(8.dp)
+                                )
+
+                                Text(
+                                    text = "O haz click aquí",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier
+                                        .padding(top = 8.dp)
+                                        .clickable {
+                                            val url = urls[currentIndex]
+                                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                                            context.startActivity(intent)
+                                        }
+                                )
+
+                                // Mostrar la imagen adicional
+                                Image(
+                                    painter = painterResource(id = additionalImages[additionalIndex]),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .padding(4.dp)
+                                        .sizeIn(maxHeight = 150.dp) // Tamaño máximo de altura sin recortar
+                                        .fillMaxWidth(),
+                                    contentScale = ContentScale.Fit // Ajusta la imagen para que quepa sin distorsionarse
                                 )
                             }
                         }

@@ -141,37 +141,42 @@ fun listarUsuarios(navController: NavController, usuarioRepository: UsuarioRepos
                                     .padding(vertical = 8.dp),
                                 elevation = CardDefaults.cardElevation(4.dp)
                             ) {
-                                Column(
+                                Row(
                                     modifier = Modifier
                                         .padding(16.dp)
-                                        .fillMaxWidth()
+                                        .fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    Text(
-                                        text = "Nombre: ${usuario.nombres} ${usuario.apellidos}",
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                    Text(
-                                        text = "Cargo: ${usuario.cargo}",
-                                        fontSize = 16.sp
-                                    )
-                                    Text(
-                                        text = "Correo: ${usuario.correo}",
-                                        fontSize = 14.sp
-                                    )
+                                    // Información del usuario
+                                    Column(
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Text(
+                                            text = "Nombre: ${usuario.nombres} ${usuario.apellidos}",
+                                            fontSize = 18.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text(
+                                            text = "Cargo: ${usuario.cargo}",
+                                            fontSize = 16.sp
+                                        )
+                                        Text(
+                                            text = "Correo: ${usuario.correo}",
+                                            fontSize = 14.sp
+                                        )
+                                    }
 
-                                    // Fila para los iconos de editar y eliminar
+                                    // Íconos de editar y eliminar
                                     Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(top = 16.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.End
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.Edit,
                                             contentDescription = "Editar",
                                             modifier = Modifier
-                                                .size(32.dp)
+                                                .size(24.dp)
                                                 .clickable {
                                                     usuarioAEditar = usuario
                                                     nombres = usuario.nombres
@@ -182,12 +187,12 @@ fun listarUsuarios(navController: NavController, usuarioRepository: UsuarioRepos
                                                 },
                                             tint = Color.Blue
                                         )
-                                        Spacer(modifier = Modifier.width(16.dp))
+                                        Spacer(modifier = Modifier.width(8.dp))
                                         Icon(
                                             imageVector = Icons.Default.Delete,
                                             contentDescription = "Eliminar",
                                             modifier = Modifier
-                                                .size(32.dp)
+                                                .size(24.dp)
                                                 .clickable {
                                                     scope.launch {
                                                         usuarioRepository.eliminar(usuario)
@@ -201,7 +206,6 @@ fun listarUsuarios(navController: NavController, usuarioRepository: UsuarioRepos
                             }
                         }
                     }
-
                     // Dialogo para editar el usuario
                     if (mostrarDialogoEditar && usuarioAEditar != null) {
                         AlertDialog(

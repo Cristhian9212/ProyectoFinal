@@ -141,41 +141,46 @@ fun ListarComputadores(navController: NavController, computadorRepository: Compu
                                     .padding(vertical = 8.dp),
                                 elevation = CardDefaults.cardElevation(4.dp)
                             ) {
-                                Column(
+                                Row(
                                     modifier = Modifier
                                         .padding(16.dp)
-                                        .fillMaxWidth()
+                                        .fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    Text(
-                                        text = "Marca: ${computador.marca}",
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                    Text(
-                                        text = "Modelo: ${computador.modelo}",
-                                        fontSize = 16.sp
-                                    )
-                                    Text(
-                                        text = "Número de Serie: ${computador.numeroSerie}",
-                                        fontSize = 14.sp
-                                    )
-                                    Text(
-                                        text = "Estado: ${computador.estado}",
-                                        fontSize = 14.sp
-                                    )
+                                    // Información del computador
+                                    Column(
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Text(
+                                            text = "Marca: ${computador.marca}",
+                                            fontSize = 18.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text(
+                                            text = "Modelo: ${computador.modelo}",
+                                            fontSize = 16.sp
+                                        )
+                                        Text(
+                                            text = "Número de Serie: ${computador.numeroSerie}",
+                                            fontSize = 14.sp
+                                        )
+                                        Text(
+                                            text = "Estado: ${computador.estado}",
+                                            fontSize = 14.sp
+                                        )
+                                    }
 
-                                    // Fila para los iconos de editar y eliminar
+                                    // Íconos de editar y eliminar
                                     Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(top = 16.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.End
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.Edit,
                                             contentDescription = "Editar",
                                             modifier = Modifier
-                                                .size(32.dp)
+                                                .size(24.dp)
                                                 .clickable {
                                                     computadorAEditar = computador
                                                     marca = computador.marca
@@ -186,12 +191,12 @@ fun ListarComputadores(navController: NavController, computadorRepository: Compu
                                                 },
                                             tint = Color.Blue
                                         )
-                                        Spacer(modifier = Modifier.width(16.dp))
+                                        Spacer(modifier = Modifier.width(8.dp))
                                         Icon(
                                             imageVector = Icons.Default.Delete,
                                             contentDescription = "Eliminar",
                                             modifier = Modifier
-                                                .size(32.dp)
+                                                .size(24.dp)
                                                 .clickable {
                                                     scope.launch {
                                                         computadorRepository.eliminar(computador)
