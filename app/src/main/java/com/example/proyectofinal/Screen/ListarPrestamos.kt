@@ -20,12 +20,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.proyectofinal.Model.PrestamoConDetalles // Asegúrate de importar esta clase correctamente
+import com.example.proyectofinal.Model.Prestamo
+import com.example.proyectofinal.Model.PrestamoConDetalles
 import com.example.proyectofinal.Repository.DetallesRepository
-import com.example.proyectofinal.Repository.PrestamoRepository
 import com.example.proyectofinal.Screen.DrawerContent
 import kotlinx.coroutines.launch
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +35,9 @@ fun ListarPrestamos(navController: NavController, detallesRepository: DetallesRe
     // Variable de estado para almacenar la lista de préstamos detallados
     var prestamos by remember { mutableStateOf(listOf<PrestamoConDetalles>()) }
 
+    // Variable de estado para almacenar el préstamo a editar y mostrar el dialogo
+    var prestamoAEditar by remember { mutableStateOf<Prestamo?>(null) }
+
     // Cargar los préstamos detallados de la base de datos al iniciar el Composable
     LaunchedEffect(Unit) {
         prestamos = detallesRepository.obtenerPrestamosConDetalles()
@@ -45,6 +47,21 @@ fun ListarPrestamos(navController: NavController, detallesRepository: DetallesRe
     val onNavigate: (String) -> Unit = { route ->
         navController.navigate(route)
         scope.launch { drawerState.close() }
+    }
+
+    // Dialogo de edición
+    if (prestamoAEditar != null) {
+        EditarPrestamoDialog(
+            prestamo = prestamoAEditar!!,
+            onDismiss = { prestamoAEditar = null },
+            onSave = { prestamoEditado ->
+                scope.launch {
+                    detallesRepository.actualizarPrestamo(prestamoEditado)
+                    prestamos = detallesRepository.obtenerPrestamosConDetalles() // Actualizar lista
+                    prestamoAEditar = null // Cerrar dialogo
+                }
+            }
+        )
     }
 
     ModalNavigationDrawer(
@@ -162,10 +179,6 @@ fun ListarPrestamos(navController: NavController, detallesRepository: DetallesRe
                                             fontSize = 16.sp
                                         )
                                         Text(
-                                            text = "Correo: ${prestamoConDetalles.solicitante.correo}",
-                                            fontSize = 16.sp
-                                        )
-                                        Text(
                                             text = "Computador: ${prestamoConDetalles.computador.marca} ${prestamoConDetalles.computador.modelo}",
                                             fontSize = 16.sp
                                         )
@@ -185,6 +198,40 @@ fun ListarPrestamos(navController: NavController, detallesRepository: DetallesRe
                                             text = "Fecha Devuelta: ${prestamoConDetalles.prestamo.fechaDevuelta ?: "No devuelto"}",
                                             fontSize = 16.sp
                                         )
+
+                                        // Agregar los botones de Eliminar y Modificar
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.End
+                                        ) {
+                                            Button(
+                                                onClick = {
+                                                    // Mostrar el diálogo de edición
+                                                    prestamoAEditar = prestamoConDetalles.prestamo
+                                                },
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = Color.Blue
+                                                )
+                                            ) {
+                                                Text("Modificar", color = Color.White)
+                                            }
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Button(
+                                                onClick = {
+                                                    // Acción para eliminar el préstamo
+                                                    scope.launch {
+                                                        detallesRepository.eliminarPrestamo(prestamoConDetalles.prestamo)
+                                                        prestamos = detallesRepository.obtenerPrestamosConDetalles()
+                                                    }
+                                                },
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = Color.Red
+                                                )
+                                            ) {
+                                                Text("Eliminar", color = Color.White)
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -195,4 +242,55 @@ fun ListarPrestamos(navController: NavController, detallesRepository: DetallesRe
             }
         )
     }
+}
+
+@Composable
+fun EditarPrestamoDialog(
+    prestamo: Prestamo,
+    onDismiss: () -> Unit,
+    onSave: (Prestamo) -> Unit
+) {
+    var fechaPrestamo by remember { mutableStateOf(prestamo.fechaPrestamo) }
+    var fechaDevolucion by remember { mutableStateOf(prestamo.fechaDevolucion) }
+    var fechaDevuelta by remember { mutableStateOf(prestamo.fechaDevuelta ?: "") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Editar Préstamo") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = fechaPrestamo,
+                    onValueChange = { fechaPrestamo = it },
+                    label = { Text("Fecha Préstamo") }
+                )
+                OutlinedTextField(
+                    value = fechaDevolucion,
+                    onValueChange = { fechaDevolucion = it },
+                    label = { Text("Fecha Devolución") }
+                )
+                OutlinedTextField(
+                    value = fechaDevuelta,
+                    onValueChange = { fechaDevuelta = it },
+                    label = { Text("Fecha Devuelta") }
+                )
+            }
+        },
+        confirmButton = {
+            Button(onClick = {
+                onSave(prestamo.copy(
+                    fechaPrestamo = fechaPrestamo,
+                    fechaDevolucion = fechaDevolucion,
+                    fechaDevuelta = if (fechaDevuelta.isBlank()) null else fechaDevuelta
+                ))
+            }) {
+                Text("Guardar")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Cancelar")
+            }
+        }
+    )
 }
