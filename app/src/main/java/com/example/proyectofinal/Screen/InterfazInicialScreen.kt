@@ -4,9 +4,11 @@ import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
@@ -19,8 +21,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -68,10 +73,10 @@ fun InterfazInicialScreen(navController: NavController) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
+                        .height(120.dp)
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.fondo),
+                        painter = painterResource(id = R.drawable.iniciosup),
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxSize()
@@ -85,15 +90,21 @@ fun InterfazInicialScreen(navController: NavController) {
                                 text = "Inicio",
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White
+                                color = Color.Black,
+                                modifier = Modifier
+                                    .padding(6.dp) // Añade relleno blanco alrededor del texto
+                                    .border(2.dp, Color.Black, RoundedCornerShape(4.dp)) // Borde negro
+                                    .padding(6.dp) // Añade relleno blanco dentro del borde
                             )
                         },
-                        navigationIcon = {
+
+                                navigationIcon = {
                             IconButton(onClick = { scope.launch { drawerState.open() } }) {
                                 Icon(
                                     imageVector = Icons.Default.Menu,
                                     contentDescription = "Abrir menú",
-                                    tint = Color.White
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(36.dp)
                                 )
                             }
                         },
@@ -147,7 +158,7 @@ fun InterfazInicialScreen(navController: NavController) {
                             R.drawable.iniciovertical1,
                             R.drawable.iniciovertical2,
                             R.drawable.iniciovertical3)
-
+//textos de descripcion
                         val descriptions = listOf(
                             "Para mayor información acercarse a la oficina de Bienestar Universitario,\n" +
                                     "o escribir al correo:\n" +
@@ -208,7 +219,7 @@ fun InterfazInicialScreen(navController: NavController) {
                                         .background(Color.White.copy(alpha = 0.5f), shape = MaterialTheme.shapes.medium)
                                         .padding(8.dp)
                                 )
-                                // Imagen adicional que cambia cada 10 segundos
+                                // Imagen adicional que cambia cada 10 segundos codigos QR
                                 val additionalImages = listOf(
                                     R.drawable.inicio1,
                                     R.drawable.inicio2,
@@ -225,7 +236,12 @@ fun InterfazInicialScreen(navController: NavController) {
                                 }
 
                                 Text(
-                                    text = "Para más información escanea el código QR.",
+                                    text = buildAnnotatedString {
+                                        append("Para más información escanea el código QR. ")
+                                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)) {
+                                            append("O haz click aquí")
+                                        }
+                                    },
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Normal,
                                     color = MaterialTheme.colorScheme.onBackground,
@@ -233,21 +249,13 @@ fun InterfazInicialScreen(navController: NavController) {
                                     modifier = Modifier
                                         .background(Color.White.copy(alpha = 0.5f), shape = MaterialTheme.shapes.medium)
                                         .padding(8.dp)
-                                )
-
-                                Text(
-                                    text = "O haz click aquí",
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier
-                                        .padding(top = 8.dp)
                                         .clickable {
                                             val url = urls[currentIndex]
                                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                                             context.startActivity(intent)
                                         }
                                 )
+
 
                                 // Mostrar la imagen adicional
                                 Image(

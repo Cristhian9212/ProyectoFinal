@@ -33,11 +33,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,7 +57,7 @@ fun DrawerContent(onNavigate: (String) -> Unit) {
                 startY = 0f,
                 endY = Float.POSITIVE_INFINITY
             ))
-    ){
+    ) {
         // Barra superior con imagen de fondo
         Box(
             modifier = Modifier
@@ -62,7 +66,7 @@ fun DrawerContent(onNavigate: (String) -> Unit) {
         ) {
             // Imagen de fondo
             Image(
-                painter = painterResource(id = R.drawable.fondo), // Reemplaza 'tu_imagen' con el nombre de tu recurso de imagen
+                painter = painterResource(id = R.drawable.iniciosup), // Reemplaza 'tu_imagen' con el nombre de tu recurso de imagen
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop // Escala la imagen para que ocupe todo el espacio del Box
@@ -87,11 +91,11 @@ fun DrawerContent(onNavigate: (String) -> Unit) {
                         modifier = Modifier.size(40.dp) // Tamaño del ícono
                     ) {
                         // Reemplaza esto con tu ícono
-                        Icon(
-                            imageVector = Icons.Default.AccountBox, // Cambia esto por tu ícono
-                            contentDescription = "Ícono de ejemplo",
-                            modifier = Modifier.size(24.dp), // Tamaño del ícono dentro del círculo
-                            tint = Color.Black // Color del ícono
+                        Image(
+                            painter = painterResource(id = R.drawable.pc), // Reemplaza 'tu_imagen' con el nombre de tu recurso de imagen
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop // Escala la imagen para que ocupe todo el espacio del Box
                         )
                     }
 
@@ -146,17 +150,27 @@ fun DrawerContent(onNavigate: (String) -> Unit) {
                     , verticalAlignment = Alignment.CenterVertically // Alineación vertical centrada
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Info,
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp) // Tamaño del ícono
+                        imageVector = ImageVector.vectorResource(id = R.drawable.pc),
+                        contentDescription = "Imagen PC",  // Sólo una vez contentDescription
+                        modifier = Modifier.size(36.dp) // Tamaño del ícono
                     )
+
                     Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el ícono y el texto
+
                     TextButton(
                         onClick = { onNavigate("registrosequipos") }, // Usa onNavigate aquí
                         colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFFFFFFF))
                     ) {
-                        Text(text = "Registrar equipos")
+                        Text(
+                            text = "Registrar equipos",
+                            style = TextStyle(
+                                fontSize = 22.sp, // Aumenta el tamaño del texto
+                                fontWeight = FontWeight.Bold, // Cambia el peso de la fuente si lo deseas
+                                color = Color.Black // Color del texto (opcional)
+                            )
+                        )
                     }
+
                 }
             }
         }
@@ -172,7 +186,7 @@ fun DrawerContent(onNavigate: (String) -> Unit) {
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Image(
-                    painter = painterResource(id = R.drawable.estudiante), // Reemplaza con tu recurso de imagen
+                    painter = painterResource(id = R.drawable.registrar), // Reemplaza con tu recurso de imagen
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxSize() // Ocupa todo el espacio de la tarjeta
@@ -190,17 +204,27 @@ fun DrawerContent(onNavigate: (String) -> Unit) {
                     , verticalAlignment = Alignment.CenterVertically // Alineación vertical centrada
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Info,
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp) // Tamaño del ícono
+                        imageVector = ImageVector.vectorResource(id = R.drawable.soli),
+                        contentDescription = "Imagen PC",  // Sólo una vez contentDescription
+                        modifier = Modifier.size(36.dp) // Tamaño del ícono
                     )
+
                     Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el ícono y el texto
+
                     TextButton(
-                        onClick = { onNavigate("registrosolicitante")},
-                        colors = ButtonDefaults.textButtonColors(contentColor = Color.White)
+                        onClick = { onNavigate("registrosolicitante") }, // Usa onNavigate aquí
+                        colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFFFFFFF))
                     ) {
-                        Text(text = "Registrar solicitante")
+                        Text(
+                            text = "registrar solicitantes",
+                            style = TextStyle(
+                                fontSize = 22.sp, // Aumenta el tamaño del texto
+                                fontWeight = FontWeight.Bold, // Cambia el peso de la fuente si lo deseas
+                                color = Color.Black // Color del texto (opcional)
+                            )
+                        )
                     }
+
                 }
             }
         }
@@ -213,11 +237,10 @@ fun DrawerContent(onNavigate: (String) -> Unit) {
                 .padding(8.dp), // Espaciado alrededor de la Card
             colors = CardDefaults.cardColors(containerColor = Color(0xFFE0E0E0)),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-            //  border = BorderStroke(2.dp, Color.Gray) // Añade un borde gris a la Card
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Image(
-                    painter = painterResource(id = R.drawable.estudiante), // Reemplaza con tu recurso de imagen
+                    painter = painterResource(id = R.drawable.prestar), // Reemplaza con tu recurso de imagen
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxSize() // Ocupa todo el espacio de la tarjeta
@@ -235,17 +258,27 @@ fun DrawerContent(onNavigate: (String) -> Unit) {
                     , verticalAlignment = Alignment.CenterVertically // Alineación vertical centrada
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Info,
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp) // Tamaño del ícono
+                        imageVector = ImageVector.vectorResource(id = R.drawable.prest),
+                        contentDescription = "Imagen PC",  // Sólo una vez contentDescription
+                        modifier = Modifier.size(36.dp) // Tamaño del ícono
                     )
+
                     Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el ícono y el texto
+
                     TextButton(
-                        onClick = {onNavigate("registro-prestamo")},
-                        colors = ButtonDefaults.textButtonColors(contentColor = Color.White)
+                        onClick = { onNavigate("registro-prestamo") }, // Usa onNavigate aquí
+                        colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFFFFFFF))
                     ) {
-                        Text(text = "Prestamos de equipos")
+                        Text(
+                            text = "Prestamo de equipos",
+                            style = TextStyle(
+                                fontSize = 22.sp, // Aumenta el tamaño del texto
+                                fontWeight = FontWeight.Bold, // Cambia el peso de la fuente si lo deseas
+                                color = Color.Black // Color del texto (opcional)
+                            )
+                        )
                     }
+
                 }
             }
         }
@@ -257,11 +290,10 @@ fun DrawerContent(onNavigate: (String) -> Unit) {
                 .padding(8.dp), // Espaciado alrededor de la Card
             colors = CardDefaults.cardColors(containerColor = Color(0xFFE0E0E0)),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-            //  border = BorderStroke(2.dp, Color.Gray) // Añade un borde gris a la Card
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Image(
-                    painter = painterResource(id = R.drawable.estudiante), // Reemplaza con tu recurso de imagen
+                    painter = painterResource(id = R.drawable.listar), // Reemplaza con tu recurso de imagen
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxSize() // Ocupa todo el espacio de la tarjeta
@@ -279,20 +311,31 @@ fun DrawerContent(onNavigate: (String) -> Unit) {
                     , verticalAlignment = Alignment.CenterVertically // Alineación vertical centrada
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Info,
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp) // Tamaño del ícono
+                        imageVector = ImageVector.vectorResource(id = R.drawable.regis),
+                        contentDescription = "Imagen PC",  // Sólo una vez contentDescription
+                        modifier = Modifier.size(36.dp) // Tamaño del ícono
                     )
+
                     Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el ícono y el texto
+
                     TextButton(
-                        onClick = { onNavigate("interfaz-listar") },
-                        colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF2AA345))
+                        onClick = { onNavigate("interfaz-listar") }, // Usa onNavigate aquí
+                        colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFFFFFFF))
                     ) {
-                        Text(text = "Validacion de registros")
+                        Text(
+                            text = "Validacion de registros",
+                            style = TextStyle(
+                                fontSize = 22.sp, // Aumenta el tamaño del texto
+                                fontWeight = FontWeight.Bold, // Cambia el peso de la fuente si lo deseas
+                                color = Color.Black // Color del texto (opcional)
+                            )
+                        )
                     }
+
                 }
             }
         }
+
 
         Card(
             modifier = Modifier
@@ -343,8 +386,8 @@ fun DrawerContent(onNavigate: (String) -> Unit) {
         Button(
             onClick = { onNavigate("Login") },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF4EA836), // Color de fondo
-                contentColor = Color.White // Color del texto
+                containerColor = Color.Transparent, // Fondo transparente para el degradado
+                contentColor = Color.Black // Color del texto
             ),
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
@@ -355,13 +398,30 @@ fun DrawerContent(onNavigate: (String) -> Unit) {
                 .clip(RoundedCornerShape(12.dp)), // Bordes redondeados
             shape = RoundedCornerShape(12.dp) // Bordes redondeados
         ) {
-            Text(
-                text = "Cerrar Sesión",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold, // Cambia el peso a Bold para mayor énfasis
-                modifier = Modifier.padding(4.dp) // Añade un poco de espaciado interno
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.linearGradient(
+                            colors = listOf(
+                                Color(0xFF57A742),
+                                Color(0xFF82CE82)
+                            ), // Degradado de verde
+                            start = Offset(0f, 0f),
+                            end = Offset(1f, 1f)
+                        ),
+                        shape = RoundedCornerShape(12.dp) // Bordes redondeados en el degradado
+                    )
+            ) {
+                Text(
+                    text = "Cerrar Sesión",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold, // Negrita para mayor énfasis
+                    modifier = Modifier
+                        .align(Alignment.Center) // Centra el texto
+                        .padding(4.dp) // Añade un poco de espaciado interno
+                )
+            }
         }
-
     }
 }

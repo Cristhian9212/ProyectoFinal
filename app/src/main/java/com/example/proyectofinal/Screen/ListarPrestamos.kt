@@ -3,9 +3,11 @@ package com.example.proyectofinal
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
@@ -85,31 +87,38 @@ fun ListarPrestamos(navController: NavController, detallesRepository: DetallesRe
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
+                        .height(120.dp)
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.fondo),
+                        painter = painterResource(id = R.drawable.iniciosup),
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxSize()
                             .align(Alignment.Center),
                         contentScale = ContentScale.Crop
                     )
+
                     TopAppBar(
                         title = {
                             Text(
-                                text = "Computadores",
+                                text = "Computadores prestados",
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White
+                                color = Color.Black,
+                                modifier = Modifier
+                                    .padding(6.dp) // Añade relleno blanco alrededor del texto
+                                    .border(2.dp, Color.Black, RoundedCornerShape(4.dp)) // Borde negro
+                                    .padding(6.dp) // Añade relleno blanco dentro del borde
                             )
                         },
+
                         navigationIcon = {
                             IconButton(onClick = { scope.launch { drawerState.open() } }) {
                                 Icon(
                                     imageVector = Icons.Default.Menu,
                                     contentDescription = "Abrir menú",
-                                    tint = Color.White
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(36.dp)
                                 )
                             }
                         },

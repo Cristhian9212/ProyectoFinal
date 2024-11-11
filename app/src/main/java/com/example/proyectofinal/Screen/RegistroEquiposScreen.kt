@@ -2,6 +2,7 @@ package com.example.proyectofinal
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -64,10 +65,10 @@ fun RegistrosequiposScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
+                        .height(120.dp)
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.fondo),
+                        painter = painterResource(id = R.drawable.iniciosup),
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxSize()
@@ -78,18 +79,24 @@ fun RegistrosequiposScreen(
                     TopAppBar(
                         title = {
                             Text(
-                                text = "Registro de Equipos de Cómputo",
+                                text = "Registrar equipo",
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White
+                                color = Color.Black,
+                                modifier = Modifier
+                                    .padding(6.dp) // Añade relleno blanco alrededor del texto
+                                    .border(2.dp, Color.Black, RoundedCornerShape(4.dp)) // Borde negro
+                                    .padding(6.dp) // Añade relleno blanco dentro del borde
                             )
                         },
+
                         navigationIcon = {
                             IconButton(onClick = { scope.launch { drawerState.open() } }) {
                                 Icon(
                                     imageVector = Icons.Default.Menu,
                                     contentDescription = "Abrir menú",
-                                    tint = Color.White
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(36.dp)
                                 )
                             }
                         },
@@ -150,40 +157,31 @@ fun RegistrosequiposScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(500.dp)
-                                        .padding(top = 100.dp),
+                                        .padding(top = 150.dp),
                                     shape = RoundedCornerShape(16.dp),
                                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                                    colors = CardDefaults.cardColors(containerColor = Color.Transparent.copy(alpha = 0.8f))
+                                    colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.8f)) // Blanco transparente
+
                                 ) {
                                     Column(
                                         modifier = Modifier.padding(16.dp),
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
-                                        Text(
-                                            text = "Registrar Computador",
-                                            fontSize = 24.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.Black
-                                        )
-
-                                        Spacer(modifier = Modifier.height(16.dp))
-
-                                        // Campo Marca
                                         TextField(
                                             value = marca,
                                             onValueChange = { marca = it },
                                             label = { Text("Marca") },
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .background(
-                                                    Color(0xFFFAFAFA),
-                                                    RoundedCornerShape(8.dp)
-                                                ),
+                                                .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp)) // Fondo blanco transparente
+                                                .border(2.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)), // Borde verde
                                             colors = TextFieldDefaults.textFieldColors(
-                                                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                                                unfocusedIndicatorColor = Color.Transparent,
-                                                focusedLabelColor = MaterialTheme.colorScheme.primary,
-                                                unfocusedLabelColor = Color.Gray
+                                                focusedIndicatorColor = Color.Transparent, // Elimina el borde inferior por defecto
+                                                unfocusedIndicatorColor = Color.Transparent, // Elimina el borde inferior por defecto
+                                                focusedLabelColor = Color(0xFF4CAF50), // Verde para el color de etiqueta enfocada
+                                                unfocusedLabelColor = Color.Gray, // Gris para la etiqueta desenfocada
+                                                containerColor = Color.Transparent, // Transparente para el fondo interno del TextField
+                                                cursorColor = Color(0xFF4CAF50) // Color del cursor
                                             )
                                         )
 
@@ -196,17 +194,18 @@ fun RegistrosequiposScreen(
                                             label = { Text("Modelo") },
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .background(
-                                                    Color(0xFFFAFAFA),
-                                                    RoundedCornerShape(8.dp)
-                                                ),
+                                                .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp)) // Fondo blanco transparente
+                                                .border(2.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)), // Borde verde
                                             colors = TextFieldDefaults.textFieldColors(
-                                                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                                                unfocusedIndicatorColor = Color.Transparent,
-                                                focusedLabelColor = MaterialTheme.colorScheme.primary,
-                                                unfocusedLabelColor = Color.Gray
+                                                focusedIndicatorColor = Color.Transparent, // Elimina el borde inferior por defecto
+                                                unfocusedIndicatorColor = Color.Transparent, // Elimina el borde inferior por defecto
+                                                focusedLabelColor = Color(0xFF4CAF50), // Verde para el color de etiqueta enfocada
+                                                unfocusedLabelColor = Color.Gray, // Gris para la etiqueta desenfocada
+                                                containerColor = Color.Transparent, // Transparente para el fondo interno del TextField
+                                                cursorColor = Color(0xFF4CAF50) // Color del cursor
                                             )
                                         )
+
 
                                         Spacer(modifier = Modifier.height(8.dp))
 
@@ -217,17 +216,18 @@ fun RegistrosequiposScreen(
                                             label = { Text("Número de Serie") },
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .background(
-                                                    Color(0xFFFAFAFA),
-                                                    RoundedCornerShape(8.dp)
-                                                ),
+                                                .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp)) // Fondo blanco transparente
+                                                .border(2.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)), // Borde verde
                                             colors = TextFieldDefaults.textFieldColors(
-                                                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                                                unfocusedIndicatorColor = Color.Transparent,
-                                                focusedLabelColor = MaterialTheme.colorScheme.primary,
-                                                unfocusedLabelColor = Color.Gray
+                                                focusedIndicatorColor = Color.Transparent, // Elimina el borde inferior por defecto
+                                                unfocusedIndicatorColor = Color.Transparent, // Elimina el borde inferior por defecto
+                                                focusedLabelColor = Color(0xFF4CAF50), // Verde para la etiqueta enfocada
+                                                unfocusedLabelColor = Color.Gray, // Gris para la etiqueta desenfocada
+                                                containerColor = Color.Transparent, // Fondo interno transparente
+                                                cursorColor = Color(0xFF4CAF50) // Color del cursor
                                             )
                                         )
+
 
                                         Spacer(modifier = Modifier.height(8.dp))
 
@@ -302,7 +302,10 @@ fun EstadoDropdown(
         // Botón que despliega el menú
         OutlinedButton(
             onClick = { expanded = !expanded },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp)) // Fondo blanco transparente
+                .border(2.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)) // Borde verde
         ) {
             Text(
                 text = selectedEstado,
@@ -325,9 +328,16 @@ fun EstadoDropdown(
                             onEstadoSelected(estadoOpcion) // Actualiza el estado al seleccionar una opción
                             expanded = false // Cierra el dropdown después de seleccionar
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp)) // Fondo blanco transparente
+                            .border(2.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)) // Borde verde
                     ) {
-                        Text(text = estadoOpcion)
+                        Text(
+                            text = estadoOpcion,
+                            color = Color.Black,
+                            modifier = Modifier.padding(8.dp)
+                        )
                     }
                 }
             }
