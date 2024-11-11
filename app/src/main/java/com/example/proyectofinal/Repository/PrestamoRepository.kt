@@ -8,7 +8,7 @@ class PrestamoRepository(private val prestamoDao: PrestamoDao) {
         prestamoDao.insertar(prestamo)
     }
 
-    suspend fun obtenerPrestamosPorSolicitante(idSolicitante: Int): List<Prestamo> {
-        return prestamoDao.obtenerPrestamosPorSolicitante(idSolicitante)
+    suspend fun obtenerPrestamosPorSolicitante(): List<Prestamo> {
+        return prestamoDao.obtenerPrestamosPorSolicitante()
     }
 }

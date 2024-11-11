@@ -11,6 +11,6 @@ interface PrestamoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertar(prestamo: Prestamo)
 
-    @Query("SELECT * FROM prestamos WHERE idSolicitante = :idSolicitante")
-    suspend fun obtenerPrestamosPorSolicitante(idSolicitante: Int): List<Prestamo>
+    @Query("SELECT * FROM prestamos")
+    suspend fun obtenerPrestamosPorSolicitante(): List<Prestamo>
 }

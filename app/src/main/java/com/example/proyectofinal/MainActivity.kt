@@ -12,12 +12,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.proyectofinal.DAO.DetallesDao
 import com.example.proyectofinal.Database.AppDatabase
 import com.example.proyectofinal.Model.Computador
 import com.example.proyectofinal.Model.Prestamo
 import com.example.proyectofinal.Model.Solicitante
 import com.example.proyectofinal.Model.Usuario
 import com.example.proyectofinal.Repository.ComputadorRepository
+import com.example.proyectofinal.Repository.DetallesRepository
 import com.example.proyectofinal.Repository.PrestamoRepository
 import com.example.proyectofinal.Repository.SolicitanteRepository
 import com.example.proyectofinal.Repository.UsuarioRepository
@@ -52,6 +54,8 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
     val SolicitanteRepository = SolicitanteRepository(SolicitanteDao)
     val PrestamoDao = database.prestamoDao()
     val prestamoRepository = PrestamoRepository(PrestamoDao)
+    val DetallesDao = database.detallesDao()
+    val DetallesRepository = DetallesRepository(DetallesDao)
 
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
@@ -161,7 +165,10 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
             ) // Pasar el navController aquí
         }
         composable("interfaz-listarprestamos") {
-            ListarPrestamos(navController = navController) // Pasar el navController aquí
+            ListarPrestamos(
+                navController = navController,
+                detallesRepository = DetallesRepository
+            ) // Pasar el navController aquí
         }
     }
 }

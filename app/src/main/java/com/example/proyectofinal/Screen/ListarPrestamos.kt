@@ -4,6 +4,8 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
@@ -18,29 +20,40 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.proyectofinal.Model.PrestamoConDetalles // Asegúrate de importar esta clase correctamente
+import com.example.proyectofinal.Repository.DetallesRepository
+import com.example.proyectofinal.Repository.PrestamoRepository
 import com.example.proyectofinal.Screen.DrawerContent
 import kotlinx.coroutines.launch
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListarPrestamos(navController: NavController) {
+fun ListarPrestamos(navController: NavController, detallesRepository: DetallesRepository) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    BackHandler(enabled = drawerState.isClosed) {
-        // Acción vacía para deshabilitar el botón de retroceso
+    // Variable de estado para almacenar la lista de préstamos detallados
+    var prestamos by remember { mutableStateOf(listOf<PrestamoConDetalles>()) }
+
+    // Cargar los préstamos detallados de la base de datos al iniciar el Composable
+    LaunchedEffect(Unit) {
+        prestamos = detallesRepository.obtenerPrestamosConDetalles()
     }
+    BackHandler(enabled = drawerState.isClosed) {}
+
     val onNavigate: (String) -> Unit = { route ->
         navController.navigate(route)
         scope.launch { drawerState.close() }
     }
+
     ModalNavigationDrawer(
         drawerContent = {
             if (drawerState.isOpen) {
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(300.dp) // Define el ancho del Drawer
+                        .width(300.dp)
                         .background(Color.White)
                 ) {
                     DrawerContent(onNavigate)
@@ -48,7 +61,7 @@ fun ListarPrestamos(navController: NavController) {
             }
         },
         drawerState = drawerState,
-        gesturesEnabled = true // Permite que se cierre tocando fuera del Drawer
+        gesturesEnabled = true
     ) {
         Scaffold(
             topBar = {
@@ -65,11 +78,10 @@ fun ListarPrestamos(navController: NavController) {
                             .align(Alignment.Center),
                         contentScale = ContentScale.Crop
                     )
-
                     TopAppBar(
                         title = {
                             Text(
-                                text = "Inicio",
+                                text = "Computadores",
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
@@ -100,15 +112,14 @@ fun ListarPrestamos(navController: NavController) {
                     Image(
                         painter = backgroundImage,
                         contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxSize(),
+                        modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
-
                     )
+
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color.White.copy(alpha = 0.6f)) // Cambia la opacidad según sea necesario
+                            .background(Color.White.copy(alpha = 0.6f))
                     )
 
                     // Contenido en primer plano
@@ -117,18 +128,71 @@ fun ListarPrestamos(navController: NavController) {
                             .fillMaxSize()
                             .padding(paddingValues),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                        verticalArrangement = Arrangement.Top
                     ) {
                         Text(
-                            text = "ACA SE VA A LISTAR LOS PRESTAMOS",
+                            text = "Lista de Préstamos",
                             fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onBackground // Asegura que el texto se vea bien sobre el fondo
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground
                         )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Usar LazyColumn para listar las Cards independientes
+                        LazyColumn(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(prestamos) { prestamoConDetalles ->
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp),
+                                    elevation = CardDefaults.cardElevation(4.dp)
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .padding(16.dp)
+                                            .fillMaxWidth()
+                                    ) {
+                                        Text(
+                                            text = "Solicitante: ${prestamoConDetalles.solicitante.nombre} ${prestamoConDetalles.solicitante.apellido}",
+                                            fontSize = 16.sp
+                                        )
+                                        Text(
+                                            text = "Correo: ${prestamoConDetalles.solicitante.correo}",
+                                            fontSize = 16.sp
+                                        )
+                                        Text(
+                                            text = "Computador: ${prestamoConDetalles.computador.marca} ${prestamoConDetalles.computador.modelo}",
+                                            fontSize = 16.sp
+                                        )
+                                        Text(
+                                            text = "Número de Serie: ${prestamoConDetalles.computador.numeroSerie}",
+                                            fontSize = 16.sp
+                                        )
+                                        Text(
+                                            text = "Fecha Préstamo: ${prestamoConDetalles.prestamo.fechaPrestamo}",
+                                            fontSize = 16.sp
+                                        )
+                                        Text(
+                                            text = "Fecha Devolución: ${prestamoConDetalles.prestamo.fechaDevolucion}",
+                                            fontSize = 16.sp
+                                        )
+                                        Text(
+                                            text = "Fecha Devuelta: ${prestamoConDetalles.prestamo.fechaDevuelta ?: "No devuelto"}",
+                                            fontSize = 16.sp
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
                     }
                 }
             }
-
         )
     }
 }

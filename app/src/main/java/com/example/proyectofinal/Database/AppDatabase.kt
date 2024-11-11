@@ -13,6 +13,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun solicitanteDao(): SolicitanteDao
     abstract fun computadorDao(): ComputadorDao
     abstract fun prestamoDao(): PrestamoDao
+    abstract fun detallesDao(): DetallesDao
 
     companion object {
         @Volatile
