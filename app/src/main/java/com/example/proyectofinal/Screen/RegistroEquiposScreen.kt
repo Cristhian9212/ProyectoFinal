@@ -1,8 +1,10 @@
 package com.example.proyectofinal
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,6 +15,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -36,12 +40,22 @@ fun RegistrosequiposScreen(
     var modelo by remember { mutableStateOf("") }
     var numeroSerie by remember { mutableStateOf("") }
     var estado by remember { mutableStateOf("Seleccionar Estado") }
+    var errorMessage by remember { mutableStateOf("") }
 
     val estados = listOf("Disponible", "Ocupado")
 
     val onNavigate: (String) -> Unit = { route ->
         navController.navigate(route)
         scope.launch { drawerState.close() }
+    }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Mostrar el mensaje en la notificación temporal
+    LaunchedEffect(errorMessage) {
+        if (errorMessage.isNotEmpty()) {
+            snackbarHostState.showSnackbar(errorMessage)
+        }
     }
 
     ModalNavigationDrawer(
@@ -84,9 +98,9 @@ fun RegistrosequiposScreen(
                                 fontWeight = FontWeight.Bold,
                                 color = Color.Black,
                                 modifier = Modifier
-                                    .padding(6.dp) // Añade relleno blanco alrededor del texto
-                                    .border(2.dp, Color.Black, RoundedCornerShape(4.dp)) // Borde negro
-                                    .padding(6.dp) // Añade relleno blanco dentro del borde
+                                    .padding(6.dp)
+                                    .border(2.dp, Color.Black, RoundedCornerShape(4.dp))
+                                    .padding(6.dp)
                             )
                         },
 
@@ -107,6 +121,37 @@ fun RegistrosequiposScreen(
                     )
                 }
             },
+            snackbarHost = {
+                SnackbarHost(hostState = snackbarHostState) { data ->
+                    Snackbar(
+                        modifier = Modifier
+                            .padding(24.dp) // Aumenta el padding para hacerlo más grande
+                            .fillMaxWidth(0.9f) // Opcional, para que ocupe casi todo el ancho
+                            .height(70.dp), // Ajusta la altura para hacer el Snackbar más grande
+                        content = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                // Imagen personalizada
+                                Image(
+                                    painter = painterResource(id = R.drawable.udec), // Reemplaza "tu_imagen" con el nombre de tu imagen
+                                    contentDescription = null,
+                                    modifier = Modifier.size(36.dp) // Aumenta el tamaño de la imagen
+                                )
+                                Spacer(modifier = Modifier.width(12.dp)) // Mayor espacio entre imagen y texto
+
+                                // Texto del Snackbar
+                                Text(
+                                    text = data.visuals.message,
+                                    fontSize = 18.sp, // Aumenta el tamaño del texto
+                                    fontWeight = FontWeight.Bold // Para hacer el texto más visible
+                                )
+                            }
+                        }
+                    )
+                }
+            }
+            ,
             content = { paddingValues ->
                 Box(
                     modifier = Modifier.fillMaxSize()
@@ -124,7 +169,6 @@ fun RegistrosequiposScreen(
                             .background(Color.White.copy(alpha = 0.8f))
                     )
 
-                    // Contenido en primer plano dentro de un LazyColumn
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
@@ -140,7 +184,6 @@ fun RegistrosequiposScreen(
                                     .padding(16.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                // Imagen encima de la Card
                                 Image(
                                     painter = painterResource(id = R.drawable.estudiante),
                                     contentDescription = null,
@@ -152,7 +195,6 @@ fun RegistrosequiposScreen(
                                     contentScale = ContentScale.Crop
                                 )
 
-                                // Card debajo de la imagen
                                 Card(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -160,8 +202,7 @@ fun RegistrosequiposScreen(
                                         .padding(top = 150.dp),
                                     shape = RoundedCornerShape(16.dp),
                                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                                    colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.8f)) // Blanco transparente
-
+                                    colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.8f))
                                 ) {
                                     Column(
                                         modifier = Modifier.padding(16.dp),
@@ -173,65 +214,60 @@ fun RegistrosequiposScreen(
                                             label = { Text("Marca") },
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp)) // Fondo blanco transparente
-                                                .border(2.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)), // Borde verde
+                                                .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
+                                                .border(1.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)),
                                             colors = TextFieldDefaults.textFieldColors(
-                                                focusedIndicatorColor = Color.Transparent, // Elimina el borde inferior por defecto
-                                                unfocusedIndicatorColor = Color.Transparent, // Elimina el borde inferior por defecto
-                                                focusedLabelColor = Color(0xFF4CAF50), // Verde para el color de etiqueta enfocada
-                                                unfocusedLabelColor = Color.Gray, // Gris para la etiqueta desenfocada
-                                                containerColor = Color.Transparent, // Transparente para el fondo interno del TextField
-                                                cursorColor = Color(0xFF4CAF50) // Color del cursor
+                                                focusedIndicatorColor = Color.Transparent,
+                                                unfocusedIndicatorColor = Color.Transparent,
+                                                focusedLabelColor = Color(0xFF4CAF50),
+                                                unfocusedLabelColor = Color.Gray,
+                                                containerColor = Color.Transparent,
+                                                cursorColor = Color(0xFF4CAF50)
                                             )
                                         )
 
                                         Spacer(modifier = Modifier.height(8.dp))
 
-                                        // Campo Modelo
                                         TextField(
                                             value = modelo,
                                             onValueChange = { modelo = it },
                                             label = { Text("Modelo") },
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp)) // Fondo blanco transparente
-                                                .border(2.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)), // Borde verde
+                                                .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
+                                                .border(1.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)),
                                             colors = TextFieldDefaults.textFieldColors(
-                                                focusedIndicatorColor = Color.Transparent, // Elimina el borde inferior por defecto
-                                                unfocusedIndicatorColor = Color.Transparent, // Elimina el borde inferior por defecto
-                                                focusedLabelColor = Color(0xFF4CAF50), // Verde para el color de etiqueta enfocada
-                                                unfocusedLabelColor = Color.Gray, // Gris para la etiqueta desenfocada
-                                                containerColor = Color.Transparent, // Transparente para el fondo interno del TextField
-                                                cursorColor = Color(0xFF4CAF50) // Color del cursor
+                                                focusedIndicatorColor = Color.Transparent,
+                                                unfocusedIndicatorColor = Color.Transparent,
+                                                focusedLabelColor = Color(0xFF4CAF50),
+                                                unfocusedLabelColor = Color.Gray,
+                                                containerColor = Color.Transparent,
+                                                cursorColor = Color(0xFF4CAF50)
                                             )
                                         )
 
-
                                         Spacer(modifier = Modifier.height(8.dp))
 
-                                        // Campo Número de Serie
                                         TextField(
                                             value = numeroSerie,
                                             onValueChange = { numeroSerie = it },
                                             label = { Text("Número de Serie") },
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp)) // Fondo blanco transparente
-                                                .border(2.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)), // Borde verde
+                                                .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
+                                                .border(1.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)),
                                             colors = TextFieldDefaults.textFieldColors(
-                                                focusedIndicatorColor = Color.Transparent, // Elimina el borde inferior por defecto
-                                                unfocusedIndicatorColor = Color.Transparent, // Elimina el borde inferior por defecto
-                                                focusedLabelColor = Color(0xFF4CAF50), // Verde para la etiqueta enfocada
-                                                unfocusedLabelColor = Color.Gray, // Gris para la etiqueta desenfocada
-                                                containerColor = Color.Transparent, // Fondo interno transparente
-                                                cursorColor = Color(0xFF4CAF50) // Color del cursor
+                                                focusedIndicatorColor = Color.Transparent,
+                                                unfocusedIndicatorColor = Color.Transparent,
+                                                focusedLabelColor = Color(0xFF4CAF50),
+                                                unfocusedLabelColor = Color.Gray,
+                                                containerColor = Color.Transparent,
+                                                cursorColor = Color(0xFF4CAF50)
                                             )
                                         )
 
-
                                         Spacer(modifier = Modifier.height(8.dp))
 
-                                        // Estado Dropdown
                                         EstadoDropdown(
                                             estados = estados,
                                             selectedEstado = estado,
@@ -245,33 +281,31 @@ fun RegistrosequiposScreen(
                                         Button(
                                             onClick = {
                                                 // Verifica que todos los campos estén llenos
-                                                if (marca.isNotBlank() && modelo.isNotBlank() && numeroSerie.isNotBlank() && estado != "Seleccionar Estado") {
-                                                    onSaveEquipo(marca.trim(), modelo.trim(), numeroSerie.trim(), estado) // Llama a la función con los valores ingresados y limpiados
-
-                                                    // Limpia los campos después de guardar
+                                                if (marca.isEmpty() || modelo.isEmpty() || numeroSerie.isEmpty() || estado == "Seleccionar Estado") {
+                                                    errorMessage = "Todos los campos son obligatorios." // Actualiza el mensaje
+                                                } else {
+                                                    onSaveEquipo(marca.trim(), modelo.trim(), numeroSerie.trim(), estado)
                                                     marca = ""
                                                     modelo = ""
                                                     numeroSerie = ""
                                                     estado = "Seleccionar Estado"
+                                                    errorMessage = "Equipo registrado con éxito." // Actualiza el mensaje
                                                 }
                                             },
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .height(56.dp)
+                                                .padding(vertical = 16.dp)
                                                 .background(
-                                                    MaterialTheme.colorScheme.primary,
-                                                    RoundedCornerShape(12.dp)
+                                                    Brush.linearGradient(
+                                                        colors = listOf(Color(0xFF4CAF50), Color(0xFF81C784)),
+                                                        start = Offset(0f, 0f),
+                                                        end = Offset(1f, 1f)
+                                                    ),
+                                                    shape = RoundedCornerShape(8.dp)
                                                 ),
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = MaterialTheme.colorScheme.primary,
-                                                contentColor = Color.White
-                                            )
+                                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
                                         ) {
-                                            Text(
-                                                text = "Registrar Computador",
-                                                fontWeight = FontWeight.Bold,
-                                                fontSize = 18.sp
-                                            )
+                                            Text("Guardar", fontSize = 20.sp, color = Color.White)
                                         }
                                     }
                                 }
@@ -291,55 +325,41 @@ fun EstadoDropdown(
     selectedEstado: String,
     onEstadoSelected: (String) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var estadoExpanded by remember { mutableStateOf(false) }
 
-    Column(
+    // Box principal para el dropdown
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.Transparent, shape = RoundedCornerShape(8.dp))
-            .padding(8.dp)
+            .padding(top = 4.dp)
+            .background(Color.Transparent)
+            .border(BorderStroke(1.dp, Color(0xFF4CAF50)), shape = MaterialTheme.shapes.small)
+            .clip(MaterialTheme.shapes.small)
+            .clickable { estadoExpanded = true }
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        // Botón que despliega el menú
-        OutlinedButton(
-            onClick = { expanded = !expanded },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp)) // Fondo blanco transparente
-                .border(2.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)) // Borde verde
-        ) {
-            Text(
-                text = selectedEstado,
-                color = if (selectedEstado == "Seleccionar Estado") Color.Gray else Color.Black,
-                modifier = Modifier.padding(8.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-        }
+        // Texto dentro del cuadro
+        Text(
+            text = selectedEstado,
+            color = Color.Black
+        )
 
-        // Menú desplegable
-        if (expanded) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
-            ) {
-                estados.forEach { estadoOpcion ->
-                    TextButton(
-                        onClick = {
-                            onEstadoSelected(estadoOpcion) // Actualiza el estado al seleccionar una opción
-                            expanded = false // Cierra el dropdown después de seleccionar
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp)) // Fondo blanco transparente
-                            .border(2.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)) // Borde verde
-                    ) {
-                        Text(
-                            text = estadoOpcion,
-                            color = Color.Black,
-                            modifier = Modifier.padding(8.dp)
-                        )
+        // DropdownMenu que aparece al hacer clic
+        DropdownMenu(
+            expanded = estadoExpanded,
+            onDismissRequest = { estadoExpanded = false },
+            modifier = Modifier
+                .background(Color.White) // Fondo blanco para el menú
+        ) {
+            // Iterar sobre la lista de estados
+            estados.forEach { estado ->
+                DropdownMenuItem(
+                    text = { Text(estado) },
+                    onClick = {
+                        onEstadoSelected(estado)
+                        estadoExpanded = false
                     }
-                }
+                )
             }
         }
     }

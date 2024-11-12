@@ -72,7 +72,7 @@ fun DrawerContent(onNavigate: (String) -> Unit) {
                 contentScale = ContentScale.Crop // Escala la imagen para que ocupe todo el espacio del Box
             )
 
-            // Card en la barra superior
+            // Card en la barra superior que tiene la informacion de quien inicia sesion
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color(0x80FFFFFF)), // Fondo semitransparente (50% opaco)
                 modifier = Modifier
