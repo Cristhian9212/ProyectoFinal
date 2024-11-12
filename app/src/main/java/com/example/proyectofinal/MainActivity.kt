@@ -7,12 +7,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.proyectofinal.DAO.DetallesDao
 import com.example.proyectofinal.Database.AppDatabase
 import com.example.proyectofinal.Model.Computador
 import com.example.proyectofinal.Model.Prestamo
@@ -67,8 +68,7 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
                         popUpTo("login") { inclusive = true }
                     }
                 },
-                onLoginError = { error -> /* Manejo de errores */ },
-                navController = navController
+                    navController = navController
             )
         }
         composable("registro") {
@@ -165,10 +165,27 @@ fun SetupNavigation(coroutineScope: CoroutineScope) {
             ) // Pasar el navController aquí
         }
         composable("interfaz-listarprestamos") {
+            val solicitanteRepository = SolicitanteRepository(SolicitanteDao)
+            val computadorRepository = ComputadorRepository(ComputadorDao)
+
+            // Utilizar mutableStateListOf para listas observables en Compose
+            val solicitantes = remember { mutableStateListOf<Solicitante>() }
+            val computadores = remember { mutableStateListOf<Computador>() }
+
+            LaunchedEffect(Unit) {
+                // Llenar las listas con datos desde los repositorios
+                solicitantes.addAll(solicitanteRepository.obtenerTodosSolicitantes())
+                computadores.addAll(computadorRepository.obtenerTodosLosComputadores())
+            }
+
             ListarPrestamos(
                 navController = navController,
-                detallesRepository = DetallesRepository
-            ) // Pasar el navController aquí
+                detallesRepository = DetallesRepository,
+                solicitantes = solicitantes,
+                computadores = computadores
+            )
         }
+
+
     }
 }

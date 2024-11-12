@@ -1,9 +1,11 @@
 package com.example.proyectofinal
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,6 +16,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -22,45 +25,44 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.proyectofinal.Model.Computador
 import com.example.proyectofinal.Model.Prestamo
 import com.example.proyectofinal.Model.PrestamoConDetalles
+import com.example.proyectofinal.Model.Solicitante
 import com.example.proyectofinal.Repository.DetallesRepository
 import com.example.proyectofinal.Screen.DrawerContent
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListarPrestamos(navController: NavController, detallesRepository: DetallesRepository) {
+fun ListarPrestamos(
+    navController: NavController,
+    detallesRepository: DetallesRepository,
+    solicitantes: List<Solicitante>,
+    computadores: List<Computador>
+) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    // Variable de estado para almacenar la lista de préstamos detallados
     var prestamos by remember { mutableStateOf(listOf<PrestamoConDetalles>()) }
-
-    // Variable de estado para almacenar el préstamo a editar y mostrar el dialogo
     var prestamoAEditar by remember { mutableStateOf<Prestamo?>(null) }
 
-    // Cargar los préstamos detallados de la base de datos al iniciar el Composable
     LaunchedEffect(Unit) {
         prestamos = detallesRepository.obtenerPrestamosConDetalles()
     }
     BackHandler(enabled = drawerState.isClosed) {}
 
-    val onNavigate: (String) -> Unit = { route ->
-        navController.navigate(route)
-        scope.launch { drawerState.close() }
-    }
-
-    // Dialogo de edición
     if (prestamoAEditar != null) {
         EditarPrestamoDialog(
             prestamo = prestamoAEditar!!,
+            solicitantes = solicitantes,
+            computadores = computadores,
             onDismiss = { prestamoAEditar = null },
             onSave = { prestamoEditado ->
                 scope.launch {
                     detallesRepository.actualizarPrestamo(prestamoEditado)
-                    prestamos = detallesRepository.obtenerPrestamosConDetalles() // Actualizar lista
-                    prestamoAEditar = null // Cerrar dialogo
+                    prestamos = detallesRepository.obtenerPrestamosConDetalles()
+                    prestamoAEditar = null
                 }
             }
         )
@@ -75,7 +77,10 @@ fun ListarPrestamos(navController: NavController, detallesRepository: DetallesRe
                         .width(300.dp)
                         .background(Color.White)
                 ) {
-                    DrawerContent(onNavigate)
+                    DrawerContent(onNavigate = { route ->
+                        navController.navigate(route)
+                        scope.launch { drawerState.close() }
+                    })
                 }
             }
         },
@@ -106,12 +111,11 @@ fun ListarPrestamos(navController: NavController, detallesRepository: DetallesRe
                                 fontWeight = FontWeight.Bold,
                                 color = Color.Black,
                                 modifier = Modifier
-                                    .padding(6.dp) // Añade relleno blanco alrededor del texto
-                                    .border(2.dp, Color.Black, RoundedCornerShape(4.dp)) // Borde negro
-                                    .padding(6.dp) // Añade relleno blanco dentro del borde
+                                    .padding(6.dp)
+                                    .border(2.dp, Color.Black, RoundedCornerShape(4.dp))
+                                    .padding(6.dp)
                             )
                         },
-
                         navigationIcon = {
                             IconButton(onClick = { scope.launch { drawerState.open() } }) {
                                 Icon(
@@ -130,10 +134,7 @@ fun ListarPrestamos(navController: NavController, detallesRepository: DetallesRe
                 }
             },
             content = { paddingValues ->
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    // Imagen de fondo
+                Box(modifier = Modifier.fillMaxSize()) {
                     val backgroundImage: Painter = painterResource(id = R.drawable.fondoprincipal)
                     Image(
                         painter = backgroundImage,
@@ -148,7 +149,6 @@ fun ListarPrestamos(navController: NavController, detallesRepository: DetallesRe
                             .background(Color.White.copy(alpha = 0.6f))
                     )
 
-                    // Contenido en primer plano
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -165,7 +165,6 @@ fun ListarPrestamos(navController: NavController, detallesRepository: DetallesRe
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Usar LazyColumn para listar las Cards independientes
                         LazyColumn(
                             modifier = Modifier.fillMaxWidth(),
                             contentPadding = PaddingValues(16.dp),
@@ -208,17 +207,13 @@ fun ListarPrestamos(navController: NavController, detallesRepository: DetallesRe
                                             fontSize = 16.sp
                                         )
 
-                                        // Agregar los botones de Eliminar y Modificar
                                         Spacer(modifier = Modifier.height(8.dp))
                                         Row(
                                             modifier = Modifier.fillMaxWidth(),
                                             horizontalArrangement = Arrangement.End
                                         ) {
                                             Button(
-                                                onClick = {
-                                                    // Mostrar el diálogo de edición
-                                                    prestamoAEditar = prestamoConDetalles.prestamo
-                                                },
+                                                onClick = { prestamoAEditar = prestamoConDetalles.prestamo },
                                                 colors = ButtonDefaults.buttonColors(
                                                     containerColor = Color.Blue
                                                 )
@@ -228,7 +223,6 @@ fun ListarPrestamos(navController: NavController, detallesRepository: DetallesRe
                                             Spacer(modifier = Modifier.width(8.dp))
                                             Button(
                                                 onClick = {
-                                                    // Acción para eliminar el préstamo
                                                     scope.launch {
                                                         detallesRepository.eliminarPrestamo(prestamoConDetalles.prestamo)
                                                         prestamos = detallesRepository.obtenerPrestamosConDetalles()
@@ -245,7 +239,6 @@ fun ListarPrestamos(navController: NavController, detallesRepository: DetallesRe
                                 }
                             }
                         }
-
                     }
                 }
             }
@@ -256,18 +249,98 @@ fun ListarPrestamos(navController: NavController, detallesRepository: DetallesRe
 @Composable
 fun EditarPrestamoDialog(
     prestamo: Prestamo,
+    solicitantes: List<Solicitante>,
+    computadores: List<Computador>,
     onDismiss: () -> Unit,
     onSave: (Prestamo) -> Unit
 ) {
     var fechaPrestamo by remember { mutableStateOf(prestamo.fechaPrestamo) }
     var fechaDevolucion by remember { mutableStateOf(prestamo.fechaDevolucion) }
     var fechaDevuelta by remember { mutableStateOf(prestamo.fechaDevuelta ?: "") }
+    var idSolicitante by remember { mutableStateOf(prestamo.idSolicitante) }
+    var idComputador by remember { mutableStateOf(prestamo.idComputador) }
+
+    var solicitanteExpanded by remember { mutableStateOf(false) }
+    var computadorExpanded by remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Editar Préstamo") },
         text = {
             Column {
+                // Selector de idSolicitante
+                Text("Solicitante")
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp)
+                        .background(Color.Transparent)
+                        .border(BorderStroke(1.dp, Color.Gray), shape = MaterialTheme.shapes.small)
+                        .clip(MaterialTheme.shapes.small)
+                        .clickable { solicitanteExpanded = true }
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = solicitantes.find { it.idSolicitante == idSolicitante }
+                            ?.let { "${it.nombre} ${it.apellido}" } ?: "Seleccionar Solicitante",
+                        color = Color.Black
+                    )
+
+                    DropdownMenu(
+                        expanded = solicitanteExpanded,
+                        onDismissRequest = { solicitanteExpanded = false }
+                    ) {
+                        solicitantes.forEach { solicitante ->
+                            DropdownMenuItem(
+                                text = { Text("${solicitante.nombre} ${solicitante.apellido}") },
+                                onClick = {
+                                    idSolicitante = solicitante.idSolicitante
+                                    solicitanteExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Selector de idComputador
+                Text("Computador")
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp)
+                        .background(Color.Transparent)
+                        .border(BorderStroke(1.dp, Color.Gray), shape = MaterialTheme.shapes.small)
+                        .clip(MaterialTheme.shapes.small)
+                        .clickable { computadorExpanded = true }
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = computadores.find { it.idComputador == idComputador }
+                            ?.let { "${it.marca} ${it.modelo}" } ?: "Seleccionar Computador",
+                        color = Color.Black
+                    )
+
+                    DropdownMenu(
+                        expanded = computadorExpanded,
+                        onDismissRequest = { computadorExpanded = false }
+                    ) {
+                        computadores.forEach { computador ->
+                            DropdownMenuItem(
+                                text = { Text("${computador.marca} ${computador.modelo}") },
+                                onClick = {
+                                    idComputador = computador.idComputador
+                                    computadorExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Campos de texto para fechas
                 OutlinedTextField(
                     value = fechaPrestamo,
                     onValueChange = { fechaPrestamo = it },
@@ -288,6 +361,8 @@ fun EditarPrestamoDialog(
         confirmButton = {
             Button(onClick = {
                 onSave(prestamo.copy(
+                    idSolicitante = idSolicitante,
+                    idComputador = idComputador,
                     fechaPrestamo = fechaPrestamo,
                     fechaDevolucion = fechaDevolucion,
                     fechaDevuelta = if (fechaDevuelta.isBlank()) null else fechaDevuelta

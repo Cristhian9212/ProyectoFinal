@@ -36,7 +36,6 @@ fun LoginScreen(
     usuarioRepository: UsuarioRepository,
     coroutineScope: CoroutineScope,
     onLoginSuccess: (Usuario) -> Unit,
-    onLoginError: (String) -> Unit,
     navController: NavController
 ) {
     var usuario by remember { mutableStateOf(TextFieldValue("")) }
