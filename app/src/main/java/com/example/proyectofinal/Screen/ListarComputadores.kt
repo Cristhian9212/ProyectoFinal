@@ -205,7 +205,7 @@ fun ListarComputadores(navController: NavController, computadorRepository: Compu
                                                     estado = computador.estado
                                                     mostrarDialogoEditar = true
                                                 },
-                                            tint = Color.Blue
+                                            tint = Color.Black
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Icon(
@@ -219,7 +219,7 @@ fun ListarComputadores(navController: NavController, computadorRepository: Compu
                                                         computadores = computadorRepository.obtenerTodosLosComputadores()
                                                     }
                                                 },
-                                            tint = Color.Red
+                                            tint = Color(color = 0xFFE20000)
                                         )
                                     }
                                 }

@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -42,6 +43,9 @@ fun listarUsuarios(navController: NavController, usuarioRepository: UsuarioRepos
     var cargo by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
 
+    // Estado para el filtro de búsqueda
+    var query by remember { mutableStateOf("") }
+
     LaunchedEffect(Unit) {
         usuarios = usuarioRepository.obtenerTodosUsuarios()
     }
@@ -52,6 +56,7 @@ fun listarUsuarios(navController: NavController, usuarioRepository: UsuarioRepos
             popUpTo("interfaz-listar") { inclusive = true }
         }
     }
+
     val onNavigate: (String) -> Unit = { route ->
         navController.navigate(route)
         scope.launch { drawerState.close() }
@@ -78,21 +83,20 @@ fun listarUsuarios(navController: NavController, usuarioRepository: UsuarioRepos
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
+                        .height(100.dp) // Ajustamos la altura para incluir la imagen iniciosup
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.iniciosup),
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxSize()
-                            .align(Alignment.Center),
+                            .align(Alignment.TopCenter),
                         contentScale = ContentScale.Crop
                     )
-
                     TopAppBar(
                         title = {
                             Text(
-                                text = "Usuarios del sistema",
+                                text = "Zona de validación",
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.Black,
@@ -125,159 +129,201 @@ fun listarUsuarios(navController: NavController, usuarioRepository: UsuarioRepos
                     modifier = Modifier.fillMaxSize()
                 ) {
                     val backgroundImage = painterResource(id = R.drawable.fondoprincipal)
+
                     Image(
                         painter = backgroundImage,
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
+
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(Color.White.copy(alpha = 0.6f))
                     )
 
-                    // Contenido en primer plano
-                    LazyColumn(
+                    Column(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(paddingValues)
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        items(usuarios) { usuario ->
-                            var iconVisible by remember { mutableStateOf(false) }
-
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                elevation = CardDefaults.cardElevation(100.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = Color.White.copy(alpha = 0.5f)// Color blanco para la tarjeta
+                        // Barra de búsqueda fuera de iniciosup
+                        OutlinedTextField(
+                            value = query,
+                            onValueChange = { query = it },
+                            label = { Text("Buscar") },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = "Buscar",
+                                    tint = Color.Black
                                 )
-                            )  {
-                                Row(
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                        .fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    // Información del usuario
-                                    Column(
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Text(
-                                            text = "Nombre: ${usuario.nombres} ${usuario.apellidos}",
-                                            fontSize = 18.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Text(
-                                            text = "Cargo: ${usuario.cargo}",
-                                            fontSize = 16.sp
-                                        )
-                                        Text(
-                                            text = "Correo: ${usuario.correo}",
-                                            fontSize = 14.sp
-                                        )
-                                    }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp), // Relleno para que no quede pegado
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = Color.Black, // Borde negro cuando está enfocado
+                                unfocusedBorderColor = Color.Black // Borde negro cuando no está enfocado
+                            )
+                        )
 
-                                    // Íconos de editar y eliminar
+                        // Listado de usuarios
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp)
+                        ) {
+                            items(usuarios.filter {
+                                it.nombres.contains(
+                                    query,
+                                    ignoreCase = true
+                                ) || it.apellidos.contains(
+                                    query,
+                                    ignoreCase = true
+                                ) || it.cargo.contains(
+                                    query,
+                                    ignoreCase = true
+                                ) || it.correo.contains(
+                                    query,
+                                    ignoreCase = true
+                                )
+                            }) { usuario ->
+                                var iconVisible by remember { mutableStateOf(false) }
+
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    elevation = CardDefaults.cardElevation(100.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = Color.White.copy(alpha = 0.5f) // Color blanco para la tarjeta
+                                    )
+                                ) {
                                     Row(
+                                        modifier = Modifier
+                                            .padding(16.dp)
+                                            .fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.End
+                                        horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = "Editar",
-                                            modifier = Modifier
-                                                .size(24.dp)
-                                                .clickable {
-                                                    usuarioAEditar = usuario
-                                                    nombres = usuario.nombres
-                                                    apellidos = usuario.apellidos
-                                                    cargo = usuario.cargo
-                                                    correo = usuario.correo
-                                                    mostrarDialogoEditar = true
-                                                },
-                                            tint = Color.Black
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Icon(
-                                            imageVector = Icons.Default.Delete,
-                                            contentDescription = "Eliminar",
-                                            modifier = Modifier
-                                                .size(24.dp)
-                                                .clickable {
-                                                    scope.launch {
-                                                        usuarioRepository.eliminar(usuario)
-                                                        usuarios = usuarioRepository.obtenerTodosUsuarios()
-                                                    }
-                                                },
-                                            tint = Color(color = 0xFFE20000)
-                                        )
+                                        // Información del usuario
+                                        Column(
+                                            modifier = Modifier.weight(1f)
+                                        ) {
+                                            Text(
+                                                text = "Nombre: ${usuario.nombres} ${usuario.apellidos}",
+                                                fontSize = 18.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Text(
+                                                text = "Cargo: ${usuario.cargo}",
+                                                fontSize = 16.sp
+                                            )
+                                            Text(
+                                                text = "Correo: ${usuario.correo}",
+                                                fontSize = 14.sp
+                                            )
+                                        }
+
+                                        // Íconos de editar y eliminar
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.End
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Editar",
+                                                modifier = Modifier
+                                                    .size(24.dp)
+                                                    .clickable {
+                                                        usuarioAEditar = usuario
+                                                        nombres = usuario.nombres
+                                                        apellidos = usuario.apellidos
+                                                        cargo = usuario.cargo
+                                                        correo = usuario.correo
+                                                        mostrarDialogoEditar = true
+                                                    },
+                                                tint = Color.Black
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Icon(
+                                                imageVector = Icons.Default.Delete,
+                                                contentDescription = "Eliminar",
+                                                modifier = Modifier
+                                                    .size(24.dp)
+                                                    .clickable {
+                                                        scope.launch {
+                                                            usuarioRepository.eliminar(usuario)
+                                                            usuarios =
+                                                                usuarioRepository.obtenerTodosUsuarios()
+                                                        }
+                                                    },
+                                                tint = Color(0xFFE20000)
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                    // Dialogo para editar el usuario
-                    if (mostrarDialogoEditar && usuarioAEditar != null) {
-                        AlertDialog(
-                            onDismissRequest = { mostrarDialogoEditar = false },
-                            title = { Text("Editar Usuario") },
-                            text = {
-                                Column {
-                                    Text("Modifica los campos del usuario aquí")
-                                    TextField(
-                                        value = nombres,
-                                        onValueChange = { nombres = it },
-                                        label = { Text("Nombres") }
-                                    )
-                                    TextField(
-                                        value = apellidos,
-                                        onValueChange = { apellidos = it },
-                                        label = { Text("Apellidos") }
-                                    )
-                                    TextField(
-                                        value = cargo,
-                                        onValueChange = { cargo = it },
-                                        label = { Text("Cargo") }
-                                    )
-                                    TextField(
-                                        value = correo,
-                                        onValueChange = { correo = it },
-                                        label = { Text("Correo") }
-                                    )
-                                }
-                            },
-                            confirmButton = {
-                                Button(onClick = {
-                                    // Lógica para guardar cambios en el usuario
-                                    val usuarioModificado = usuarioAEditar?.copy(
-                                        nombres = nombres,
-                                        apellidos = apellidos,
-                                        cargo = cargo,
-                                        correo = correo
-                                    )
-                                    usuarioModificado?.let {
-                                        scope.launch {
-                                            usuarioRepository.actualizar(it)
-                                            usuarios = usuarioRepository.obtenerTodosUsuarios()
-                                        }
+                        // Dialogo para editar el usuario
+                        if (mostrarDialogoEditar && usuarioAEditar != null) {
+                            AlertDialog(
+                                onDismissRequest = { mostrarDialogoEditar = false },
+                                title = { Text("Editar Usuario") },
+                                text = {
+                                    Column {
+                                        Text("Modifica los campos del usuario aquí")
+                                        TextField(
+                                            value = nombres,
+                                            onValueChange = { nombres = it },
+                                            label = { Text("Nombres") }
+                                        )
+                                        TextField(
+                                            value = apellidos,
+                                            onValueChange = { apellidos = it },
+                                            label = { Text("Apellidos") }
+                                        )
+                                        TextField(
+                                            value = cargo,
+                                            onValueChange = { cargo = it },
+                                            label = { Text("Cargo") }
+                                        )
+                                        TextField(
+                                            value = correo,
+                                            onValueChange = { correo = it },
+                                            label = { Text("Correo") }
+                                        )
                                     }
-                                    mostrarDialogoEditar = false
-                                }) {
-                                    Text("Guardar")
+                                },
+                                confirmButton = {
+                                    Button(onClick = {
+                                        // Lógica para guardar cambios en el usuario
+                                        val usuarioModificado = usuarioAEditar?.copy(
+                                            nombres = nombres,
+                                            apellidos = apellidos,
+                                            cargo = cargo,
+                                            correo = correo
+                                        )
+                                        usuarioModificado?.let {
+                                            scope.launch {
+                                                usuarioRepository.actualizar(it)
+                                                usuarios = usuarioRepository.obtenerTodosUsuarios()
+                                                mostrarDialogoEditar = false
+                                            }
+                                        }
+                                    }) {
+                                        Text("Guardar Cambios")
+                                    }
+                                },
+                                dismissButton = {
+                                    Button(onClick = { mostrarDialogoEditar = false }) {
+                                        Text("Cancelar")
+                                    }
                                 }
-                            },
-                            dismissButton = {
-                                Button(onClick = { mostrarDialogoEditar = false }) {
-                                    Text("Cancelar")
-                                }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }

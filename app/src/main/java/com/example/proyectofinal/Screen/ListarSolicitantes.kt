@@ -217,7 +217,7 @@ fun ListarSolicitantes(
                                                     idUsuarioSeleccionado = usuario.idUsuario
                                                     mostrarDialogoEditar = true
                                                 },
-                                            tint = Color.Blue
+                                            tint = Color.Black
                                         )
                                         Icon(
                                             imageVector = Icons.Default.Delete,
@@ -230,7 +230,7 @@ fun ListarSolicitantes(
                                                         solicitantesConUsuarios = solicitanteRepository.obtenerSolicitantesConUsuarios()
                                                     }
                                                 },
-                                            tint = Color.Red
+                                            tint = Color(color = 0xFFE20000)
                                         )
                                     }
                                 }

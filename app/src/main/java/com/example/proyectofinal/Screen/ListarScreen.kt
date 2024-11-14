@@ -133,7 +133,7 @@ fun ListarScreen(navController: NavController) {
                         verticalArrangement = Arrangement.Center
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.prestar),
+                            painter = painterResource(id = R.drawable.listar),
                             contentDescription = null,
                             modifier = Modifier
                                 .size(200.dp)

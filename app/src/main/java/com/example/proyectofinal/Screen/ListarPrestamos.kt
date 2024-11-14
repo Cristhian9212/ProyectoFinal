@@ -237,7 +237,7 @@ fun ListarPrestamos(
                                                     }
                                                 },
                                                 colors = ButtonDefaults.buttonColors(
-                                                    containerColor = Color.Red
+                                                    containerColor = Color(color = 0xFFE20000)
                                                 )
                                             ) {
                                                 Text("Eliminar", color = Color.White)
