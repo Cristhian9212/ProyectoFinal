@@ -79,7 +79,7 @@ fun RegistrosequiposScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(120.dp)
+                        .height(100.dp)
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.iniciosup),
@@ -198,7 +198,7 @@ fun RegistrosequiposScreen(
                                 Card(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(500.dp)
+                                        .height(550.dp)
                                         .padding(top = 150.dp),
                                     shape = RoundedCornerShape(16.dp),
                                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
@@ -331,6 +331,7 @@ fun EstadoDropdown(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .height(60.dp)
             .padding(top = 4.dp)
             .background(Color.Transparent)
             .border(BorderStroke(1.dp, Color(0xFF4CAF50)), shape = MaterialTheme.shapes.small)
@@ -341,7 +342,8 @@ fun EstadoDropdown(
         // Texto dentro del cuadro
         Text(
             text = selectedEstado,
-            color = Color.Black
+            color = Color.Gray,
+            modifier = Modifier.padding(vertical = 10.dp)
         )
 
         // DropdownMenu que aparece al hacer clic
@@ -349,7 +351,9 @@ fun EstadoDropdown(
             expanded = estadoExpanded,
             onDismissRequest = { estadoExpanded = false },
             modifier = Modifier
-                .background(Color.White) // Fondo blanco para el menú
+                .fillMaxWidth() // Asegura que el DropdownMenu tenga el mismo ancho que el Box
+                .background(Color.White)
+                .offset(y = 4.dp) // Desplaza el menú justo debajo del Box sin espacios grandes
         ) {
             // Iterar sobre la lista de estados
             estados.forEach { estado ->

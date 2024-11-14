@@ -74,7 +74,7 @@ fun listarUsuarios(navController: NavController, usuarioRepository: UsuarioRepos
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(120.dp)
+                        .height(100.dp)
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.iniciosup),

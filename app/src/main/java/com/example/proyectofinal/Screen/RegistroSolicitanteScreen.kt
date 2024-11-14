@@ -1,11 +1,14 @@
 package com.example.proyectofinal
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -14,10 +17,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -42,14 +47,27 @@ fun RegistroSolicitanteScreen(
     var correo by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") } // Para los mensajes de error o éxito
+    var correoError by remember { mutableStateOf("") }
+
+// Expresión regular para validar el formato de correo electrónico
+    val correoRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
 
     var idUsuario by remember { mutableStateOf<Int?>(null) }
     var expanded by remember { mutableStateOf(false) }
     var selectedUsuario by remember { mutableStateOf<Usuario?>(null) }
     val usuarios = remember { mutableStateOf<List<Usuario>>(emptyList()) }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
     LaunchedEffect(true) {
         usuarios.value = usuarioRepository.obtenerTodosUsuarios()
+    }
+
+    // Mostrar el mensaje en la notificación temporal `Snackbar`
+    LaunchedEffect(errorMessage) {
+        if (errorMessage.isNotEmpty()) {
+            snackbarHostState.showSnackbar(errorMessage)
+        }
     }
 
     ModalNavigationDrawer(
@@ -74,7 +92,7 @@ fun RegistroSolicitanteScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(120.dp)
+                        .height(100.dp)
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.iniciosup),
@@ -113,7 +131,37 @@ fun RegistroSolicitanteScreen(
                         ),
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
-                } },
+                }},
+            snackbarHost = {
+                SnackbarHost(hostState = snackbarHostState) { data ->
+                    Snackbar(
+                        modifier = Modifier
+                            .padding(24.dp)
+                            .fillMaxWidth(0.9f)
+                            .height(70.dp),
+                        content = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                // Imagen personalizada
+                                Image(
+                                    painter = painterResource(id = R.drawable.udec),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(36.dp)
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+
+                                // Texto del Snackbar
+                                Text(
+                                    text = data.visuals.message,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    )
+                }
+            },
             content = { paddingValues ->
                 Column(
                     modifier = Modifier
@@ -123,11 +171,29 @@ fun RegistroSolicitanteScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.registrar),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(200.dp)
+                                .align(Alignment.TopCenter)
+                                .offset(y = (-10).dp)
+                                .clip(RoundedCornerShape(16.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 50.dp)
-                            .heightIn(max = 400.dp)
+                            .heightIn(max = 600.dp)
                             .wrapContentHeight(),
                         shape = RoundedCornerShape(16.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
@@ -141,36 +207,45 @@ fun RegistroSolicitanteScreen(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            Text("ID Usuario:")
-                            OutlinedTextField(
-                                value = selectedUsuario?.let { "${it.nombres} ${it.apellidos}" } ?: "",
-                                onValueChange = {},
-                                label = { Text("Seleccionar Usuario") },
-                                modifier = Modifier.fillMaxWidth(),
-                                readOnly = true,
-                                trailingIcon = {
-                                    IconButton(onClick = { expanded = !expanded }) {
-                                        Icon(
-                                            imageVector = Icons.Default.ArrowDropDown,
-                                            contentDescription = "Desplegar opciones"
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(60.dp)
+                                    .padding(top = 4.dp)
+                                    .background(Color.Transparent)
+                                    .border(BorderStroke(1.dp, Color(0xFF4CAF50)), shape = MaterialTheme.shapes.small)
+                                    .clip(MaterialTheme.shapes.small)
+                                    .clickable { expanded = true } // Manejo del estado de expansión
+                                    .padding(vertical = 10.dp)
+                            ) {
+                                // Texto para el usuario seleccionado o texto por defecto si no se ha seleccionado ninguno
+                                Text(
+                                    text = selectedUsuario?.let { "${it.nombres} ${it.apellidos}" } ?: "Seleccionar Usuario",
+                                    color = Color.Gray,
+                                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 10.dp)
+                                )
+
+                                // DropdownMenu para desplegar las opciones de usuarios
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false },
+                                    modifier = Modifier
+                                        .fillMaxWidth() // Asegura que el DropdownMenu tenga el mismo ancho que el Box
+                                        .background(Color.White)
+                                        .offset(y = 4.dp) // Desplaza el menú justo debajo del Box sin espacios grandes
+                                ) {
+                                    // Iterar sobre la lista de usuarios para mostrar cada uno como opción
+                                    usuarios.value.forEach { usuario ->
+                                        DropdownMenuItem(
+                                            text = { Text("${usuario.nombres} ${usuario.apellidos}") },
+                                            onClick = {
+                                                selectedUsuario = usuario
+                                                idUsuario = usuario.idUsuario
+                                                expanded = false // Cerrar menú después de seleccionar
+                                            }
                                         )
                                     }
-                                }
-                            )
-
-                            DropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false }
-                            ) {
-                                usuarios.value.forEach { usuario ->
-                                    DropdownMenuItem(
-                                        text = { Text("${usuario.nombres} ${usuario.apellidos}") },
-                                        onClick = {
-                                            selectedUsuario = usuario
-                                            idUsuario = usuario.idUsuario
-                                            expanded = false
-                                        }
-                                    )
                                 }
                             }
 
@@ -212,21 +287,35 @@ fun RegistroSolicitanteScreen(
 
                             TextField(
                                 value = correo,
-                                onValueChange = { correo = it },
+                                onValueChange = {
+                                    correo = it
+                                    correoError = if (correoRegex.matches(it)) "" else "Correo no válido"
+                                },
                                 label = { Text("Correo") },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
-                                    .border(1.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)),
+                                    .border(1.dp, if (correoError.isEmpty()) Color(0xFF4CAF50) else Color.Red, RoundedCornerShape(8.dp)),
                                 colors = TextFieldDefaults.textFieldColors(
                                     focusedIndicatorColor = Color.Transparent,
                                     unfocusedIndicatorColor = Color.Transparent,
-                                    focusedLabelColor = Color(0xFF4CAF50),
+                                    focusedLabelColor = if (correoError.isEmpty()) Color(0xFF4CAF50) else Color.Red,
                                     unfocusedLabelColor = Color.Gray,
                                     containerColor = Color.Transparent,
                                     cursorColor = Color(0xFF4CAF50)
-                                )
+                                ),
+                                isError = correoError.isNotEmpty()
                             )
+
+// Mostrar mensaje de error si el correo es inválido
+                            if (correoError.isNotEmpty()) {
+                                Text(
+                                    text = correoError,
+                                    color = Color.Red,
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.padding(top = 4.dp)
+                                )
+                            }
 
                             TextField(
                                 value = telefono,
@@ -243,15 +332,21 @@ fun RegistroSolicitanteScreen(
                                     unfocusedLabelColor = Color.Gray,
                                     containerColor = Color.Transparent,
                                     cursorColor = Color(0xFF4CAF50)
-                                )
+                                ),
+                                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number) // Teclado numérico
                             )
+
 
                             Button(
                                 onClick = {
-                                    // Verifica que todos los campos estén completos
+                                    // Verifica que todos los campos estén completos y que el correo sea válido
                                     if (nombre.isEmpty() || apellido.isEmpty() || correo.isEmpty() || telefono.isEmpty()) {
                                         errorMessage = "Todos los campos son obligatorios."
+                                    } else if (correoError.isNotEmpty()) {
+                                        // Mensaje de error específico para correo no válido
+                                        errorMessage = "Por favor, ingresa un correo válido."
                                     } else {
+                                        // Guardar sólo si no hay error en el correo
                                         idUsuario?.let { idUsuario ->
                                             scope.launch {
                                                 onSaveEquipo(nombre.trim(), apellido.trim(), correo.trim(), telefono.trim(), idUsuario)
@@ -260,26 +355,20 @@ fun RegistroSolicitanteScreen(
                                                 correo = ""
                                                 telefono = ""
                                                 selectedUsuario = null
-                                                errorMessage = "Equipo registrado con éxito."
+                                                errorMessage = "Estudiante registrado con éxito."
                                             }
                                         }
                                     }
                                 },
+                                enabled = correoError.isEmpty(), // Desactiva el botón si el correo es inválido
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 16.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (correoError.isEmpty()) Color(0xFF4CAF50) else Color.Gray // Cambia el color si está deshabilitado
+                                )
                             ) {
                                 Text("Guardar", fontSize = 20.sp, color = Color.White)
-                            }
-
-                            // Mostrar mensaje de error o éxito si existe
-                            if (errorMessage.isNotEmpty()) {
-                                Text(
-                                    text = errorMessage,
-                                    color = if (errorMessage.contains("éxito")) Color.Green else Color.Red,
-                                    modifier = Modifier.padding(top = 8.dp)
-                                )
                             }
                         }
                     }
