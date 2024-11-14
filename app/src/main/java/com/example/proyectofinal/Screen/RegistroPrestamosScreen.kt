@@ -1,6 +1,7 @@
 package com.example.proyectofinal
 
 import android.app.DatePickerDialog
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -89,6 +90,12 @@ fun RegistroPrestamosScreen(
     var isDatePickerVisibleDevolucion by remember { mutableStateOf(false) }
     var isDatePickerVisibleDevuelta by remember { mutableStateOf(false) }
 
+    BackHandler {
+        // Navega hacia la pantalla inicial cuando el usuario retrocede
+        navController.navigate("interfaz_inicial") {
+            popUpTo("interfaz_inicial") { inclusive = true }
+        }
+    }
     LaunchedEffect(true) {
         solicitantes.value = solicitanteRepository.obtenerTodosSolicitantes()
         computadores.value = computadorRepository.obtenerTodosLosComputadores()
@@ -205,7 +212,7 @@ fun RegistroPrestamosScreen(
                     // Imagen principal
                     item {
                         Image(
-                            painter = painterResource(id = R.drawable.registrar),
+                            painter = painterResource(id = R.drawable.prestar),
                             contentDescription = null,
                             modifier = Modifier
                                 .size(200.dp)

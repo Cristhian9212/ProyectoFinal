@@ -46,8 +46,12 @@ fun listarUsuarios(navController: NavController, usuarioRepository: UsuarioRepos
         usuarios = usuarioRepository.obtenerTodosUsuarios()
     }
 
-    BackHandler(enabled = drawerState.isClosed) {}
-
+    BackHandler {
+        // Navega hacia la pantalla inicial cuando el usuario retrocede
+        navController.navigate("interfaz-listar") {
+            popUpTo("interfaz-listar") { inclusive = true }
+        }
+    }
     val onNavigate: (String) -> Unit = { route ->
         navController.navigate(route)
         scope.launch { drawerState.close() }
@@ -148,8 +152,11 @@ fun listarUsuarios(navController: NavController, usuarioRepository: UsuarioRepos
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 8.dp),
-                                elevation = CardDefaults.cardElevation(4.dp)
-                            ) {
+                                elevation = CardDefaults.cardElevation(100.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = Color.White.copy(alpha = 0.5f)// Color blanco para la tarjeta
+                                )
+                            )  {
                                 Row(
                                     modifier = Modifier
                                         .padding(16.dp)
@@ -194,7 +201,7 @@ fun listarUsuarios(navController: NavController, usuarioRepository: UsuarioRepos
                                                     correo = usuario.correo
                                                     mostrarDialogoEditar = true
                                                 },
-                                            tint = Color.Blue
+                                            tint = Color.Black
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Icon(
@@ -208,7 +215,7 @@ fun listarUsuarios(navController: NavController, usuarioRepository: UsuarioRepos
                                                         usuarios = usuarioRepository.obtenerTodosUsuarios()
                                                     }
                                                 },
-                                            tint = Color.Red
+                                            tint = Color(color = 0xFFE20000)
                                         )
                                     }
                                 }

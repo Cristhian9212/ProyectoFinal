@@ -1,5 +1,6 @@
 package com.example.proyectofinal
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -59,6 +60,12 @@ fun RegistroSolicitanteScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
+    BackHandler {
+        // Navega hacia la pantalla inicial cuando el usuario retrocede
+        navController.navigate("interfaz_inicial") {
+            popUpTo("interfaz_inicial") { inclusive = true }
+        }
+    }
     LaunchedEffect(true) {
         usuarios.value = usuarioRepository.obtenerTodosUsuarios()
     }

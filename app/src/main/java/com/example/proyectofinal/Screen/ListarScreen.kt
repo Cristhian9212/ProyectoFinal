@@ -1,6 +1,7 @@
 package com.example.proyectofinal
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,6 +13,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -29,13 +32,18 @@ fun ListarScreen(navController: NavController) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    BackHandler(enabled = drawerState.isClosed) {
-        // Acción vacía para deshabilitar el botón de retroceso
+    BackHandler {
+        // Navega hacia la pantalla inicial cuando el usuario retrocede
+        navController.navigate("interfaz_inicial") {
+            popUpTo("interfaz_inicial") { inclusive = true }
+        }
     }
+
     val onNavigate: (String) -> Unit = { route ->
         navController.navigate(route)
         scope.launch { drawerState.close() }
     }
+
     ModalNavigationDrawer(
         drawerContent = {
             if (drawerState.isOpen) {
@@ -124,84 +132,134 @@ fun ListarScreen(navController: NavController) {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Text(
-                            text = "Interfaz para listar",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onBackground
+                        Image(
+                            painter = painterResource(id = R.drawable.prestar),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(200.dp)
+                                .padding(top = 10.dp)
+                                .clip(RoundedCornerShape(16.dp)),
+                            contentScale = ContentScale.Crop
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(25.dp))
+
+                        // Estilo común para las tarjetas, con mayor tamaño
+                        val cardModifier = Modifier
+                            .fillMaxWidth()
+                            .height(80.dp) // Aumenta la altura de la tarjeta
+                            .padding(vertical = 10.dp)
+                            .shadow(elevation = 4.dp, shape = RoundedCornerShape(16.dp))
 
                         // Primera tarjeta
                         OutlinedCard(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
+                            modifier = cardModifier,
+                            shape = RoundedCornerShape(16.dp),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                            colors = CardDefaults.outlinedCardColors(
+                                containerColor = Color.White.copy(alpha = 0.9f)
+                            )
                         ) {
-                            TextButton(
-                                onClick = {onNavigate("interfaz-listarusuarios") },
-                                modifier = Modifier.fillMaxWidth()
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
                             ) {
-                                Text(
-                                    text = "Listado de usuarios",
-                                    fontSize = 16.sp,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
+                                TextButton(
+                                    onClick = { onNavigate("interfaz-listarusuarios") },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = "Listado de usuarios",
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = Color.Black // Color del texto cambiado a negro
+                                    )
+                                }
                             }
                         }
+
 
                         // Segunda tarjeta
                         OutlinedCard(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                        ) {
-                            TextButton(
-                                onClick = { onNavigate("interfaz-listarestudiantes") },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = "Listado de estudiantes",
-                                    fontSize = 16.sp,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
+                            modifier = cardModifier,
+                            shape = RoundedCornerShape(16.dp),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                            colors = CardDefaults.outlinedCardColors(
+                                containerColor = Color.White.copy(alpha = 0.9f)
+                            )
+                        )
+                            {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    TextButton(
+                                        onClick = { onNavigate("interfaz-listarestudiantes") },
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Text(
+                                            text = "Listado de estudiantes",
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            color = Color.Black
+                                        )
+                                    }
+                                }
                             }
-                        }
 
                         // Tercera tarjeta
                         OutlinedCard(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                        ) {
+                            modifier = cardModifier,
+                            shape = RoundedCornerShape(16.dp),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                            colors = CardDefaults.outlinedCardColors(
+                                containerColor = Color.White.copy(alpha = 0.9f)
+
+                            )
+                        )
+                        {
+                           Box(
+                               modifier = Modifier.fillMaxSize(),
+                               contentAlignment = Alignment.Center
+                           ) {
                             TextButton(
-                                onClick = { onNavigate("interfaz-listarcomputadores" )},
+                                onClick = { onNavigate("interfaz-listarcomputadores") },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Text(
                                     text = "Listado de computadores",
-                                    fontSize = 16.sp,
-                                    color = MaterialTheme.colorScheme.primary
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color.Black
                                 )
                             }
+                        }
                         }
 
                         // Cuarta tarjeta
                         OutlinedCard(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
+                            modifier = cardModifier,
+                            shape = RoundedCornerShape(16.dp),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                            colors = CardDefaults.outlinedCardColors(
+                                containerColor = Color.White.copy(alpha = 0.9f)
+                            )
                         ) {
-                            TextButton(
-                                onClick = { onNavigate("interfaz-listarprestamos")},
-                                modifier = Modifier.fillMaxWidth()
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
                             ) {
-                                Text(
-                                    text = "Listado de prestamos",
-                                    fontSize = 16.sp,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
+                                TextButton(
+                                    onClick = { onNavigate("interfaz-listarprestamos") },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = "Listado de préstamos",
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = Color.Black
+                                    )
+                                }
                             }
                         }
                     }

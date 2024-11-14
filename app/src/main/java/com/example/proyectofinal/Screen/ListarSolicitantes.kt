@@ -61,7 +61,12 @@ fun ListarSolicitantes(
         usuariosDisponibles = usuarioRepository.obtenerTodosUsuarios()// Asume que esto devuelve la lista de usuarios
     }
 
-    BackHandler(enabled = drawerState.isClosed) {}
+    BackHandler {
+        // Navega hacia la pantalla inicial cuando el usuario retrocede
+        navController.navigate("interfaz-listar") {
+            popUpTo("interfaz-listar") { inclusive = true }
+        }
+    }
     val onNavigate: (String) -> Unit = { route ->
         navController.navigate(route)
         scope.launch { drawerState.close() }
@@ -159,8 +164,11 @@ fun ListarSolicitantes(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 8.dp),
-                                elevation = CardDefaults.cardElevation(4.dp)
-                            ) {
+                                elevation = CardDefaults.cardElevation(100.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = Color.White.copy(alpha = 0.5f)// Color blanco para la tarjeta
+                                )
+                            ){
                                 Row(
                                     modifier = Modifier
                                         .padding(16.dp)
