@@ -2,32 +2,12 @@ package com.example.proyectofinal.Screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,378 +29,343 @@ import com.example.proyectofinal.R
 
 @Composable
 fun DrawerContent(onNavigate: (String) -> Unit) {
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(brush = Brush.verticalGradient(
-                colors = listOf(Color.White, Color(0xFFE0E0E0)), // Degradado de blanco a gris claro
-                startY = 0f,
-                endY = Float.POSITIVE_INFINITY
-            ))
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color.White, Color(0xFFE0E0E0)),
+                    startY = 0f,
+                    endY = Float.POSITIVE_INFINITY
+                )
+            )
     ) {
         // Barra superior con imagen de fondo
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(225.dp) // Altura de la barra superior
-        ) {
-            // Imagen de fondo
-            Image(
-                painter = painterResource(id = R.drawable.iniciosup), // Reemplaza 'tu_imagen' con el nombre de tu recurso de imagen
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop // Escala la imagen para que ocupe todo el espacio del Box
-            )
-
-            // Card en la barra superior que tiene la informacion de quien inicia sesion
-            Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0x80FFFFFF)), // Fondo semitransparente (50% opaco)
+        item {
+            Box(
                 modifier = Modifier
-                    .align(Alignment.Center) // Centra la Card en el Box
-                    .padding(16.dp) // Espaciado alrededor de la Card
-                    .size(300.dp, 150.dp) // Tamaño aumentado de la Card
+                    .fillMaxWidth()
+                    .height(225.dp)
             ) {
-                Row(
-                    modifier = Modifier.padding(16.dp), // Espaciado interno de la Card
-                    verticalAlignment = Alignment.CenterVertically // Alinear verticalmente al centro
-                ) {
-                    // Ícono redondo
-                    Surface(
-                        shape = CircleShape,
-                        color = Color(0x80FFFFFF), // Color de fondo del ícono
-                        modifier = Modifier.size(40.dp) // Tamaño del ícono
-                    ) {
-                        // Reemplaza esto con tu ícono
-                        Image(
-                            painter = painterResource(id = R.drawable.pc), // Reemplaza 'tu_imagen' con el nombre de tu recurso de imagen
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop // Escala la imagen para que ocupe todo el espacio del Box
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(16.dp)) // Espacio entre el ícono y el texto
-
-                    Column {
-                        Text(
-                            text = "Título de la Card", // Cambia este texto según lo que necesites
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black // Cambia el color del texto si es necesario
-                        )
-                        Text(
-                            text = "Descripción opcional", // Texto adicional
-                            fontSize = 14.sp,
-                            color = Color.Black // Cambia el color del texto si es necesario
-                        )
-                    }
-                }
-            }
-        }
-
-// Contenido del Drawer
-        Spacer(modifier = Modifier.height(16.dp))
-
-
-        Card(
-            modifier = Modifier
-                .widthIn(max = 300.dp) // Establece un ancho máximo para la Card
-                .heightIn(max = 100.dp)
-                .padding(8.dp), // Espaciado alrededor de la Card
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFE0E0E0)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        ) {
-            Box(modifier = Modifier.fillMaxSize()) {
                 Image(
-                    painter = painterResource(id = R.drawable.equipos), // Reemplaza con tu recurso de imagen
+                    painter = painterResource(id = R.drawable.iniciosup),
                     contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxSize() // Ocupa todo el espacio de la tarjeta
-                        .align(Alignment.Center) // Centra la imagen
-                        .clip(RoundedCornerShape(8.dp)) // Aplica bordes redondeados a la imagen
-                        .graphicsLayer(alpha = 0.7f), // Establece la transparencia de la imagen
-                    contentScale = ContentScale.Crop // Ajusta cómo se escala la imagen
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
                 )
 
-                Row(
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0x80FFFFFF)),
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp) // Espaciado interno de la Card
-                        .align(Alignment.BottomStart) // Alinea el Row en la parte inferior
-                    , verticalAlignment = Alignment.CenterVertically // Alineación vertical centrada
+                        .align(Alignment.Center)
+                        .padding(16.dp)
+                        .size(300.dp, 150.dp)
                 ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.pc),
-                        contentDescription = "Imagen PC",  // Sólo una vez contentDescription
-                        modifier = Modifier.size(36.dp) // Tamaño del ícono
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el ícono y el texto
-
-                    TextButton(
-                        onClick = { onNavigate("registrosequipos") }, // Usa onNavigate aquí
-                        colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFFFFFFF))
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "Registrar equipos",
-                            style = TextStyle(
-                                fontSize = 22.sp, // Aumenta el tamaño del texto
-                                fontWeight = FontWeight.Bold, // Cambia el peso de la fuente si lo deseas
-                                color = Color.Black // Color del texto (opcional)
+                        Surface(
+                            shape = CircleShape,
+                            color = Color(0x80FFFFFF),
+                            modifier = Modifier.size(40.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.pc),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
                             )
-                        )
-                    }
+                        }
 
-                }
-            }
-        }
+                        Spacer(modifier = Modifier.width(16.dp))
 
-
-        Card(
-            modifier = Modifier
-                .widthIn(max = 300.dp) // Establece un ancho máximo para la Card
-                .heightIn(max = 100.dp)
-                .padding(8.dp), // Espaciado alrededor de la Card
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFE0E0E0)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        ) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Image(
-                    painter = painterResource(id = R.drawable.registrar), // Reemplaza con tu recurso de imagen
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxSize() // Ocupa todo el espacio de la tarjeta
-                        .align(Alignment.Center) // Centra la imagen
-                        .clip(RoundedCornerShape(8.dp)) // Aplica bordes redondeados a la imagen
-                        .graphicsLayer(alpha = 0.7f), // Establece la transparencia de la imagen
-                    contentScale = ContentScale.Crop // Ajusta cómo se escala la imagen
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp) // Espaciado interno de la Card
-                        .align(Alignment.BottomStart) // Alinea el Row en la parte inferior
-                    , verticalAlignment = Alignment.CenterVertically // Alineación vertical centrada
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.soli),
-                        contentDescription = "Imagen PC",  // Sólo una vez contentDescription
-                        modifier = Modifier.size(36.dp) // Tamaño del ícono
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el ícono y el texto
-
-                    TextButton(
-                        onClick = { onNavigate("registrosolicitante") }, // Usa onNavigate aquí
-                        colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFFFFFFF))
-                    ) {
-                        Text(
-                            text = "registrar solicitantes",
-                            style = TextStyle(
-                                fontSize = 22.sp, // Aumenta el tamaño del texto
-                                fontWeight = FontWeight.Bold, // Cambia el peso de la fuente si lo deseas
-                                color = Color.Black // Color del texto (opcional)
+                        Column {
+                            Text(
+                                text = "Título de la Card",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black
                             )
-                        )
-                    }
-
-                }
-            }
-        }
-
-// Tarjeta para "Solicitud de préstamo"
-        Card(
-            modifier = Modifier
-                .widthIn(max = 300.dp) // Establece un ancho máximo para la Card
-                .heightIn(max = 100.dp)
-                .padding(8.dp), // Espaciado alrededor de la Card
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFE0E0E0)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        ) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Image(
-                    painter = painterResource(id = R.drawable.prestar), // Reemplaza con tu recurso de imagen
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxSize() // Ocupa todo el espacio de la tarjeta
-                        .align(Alignment.Center) // Centra la imagen
-                        .clip(RoundedCornerShape(8.dp)) // Aplica bordes redondeados a la imagen
-                        .graphicsLayer(alpha = 0.7f), // Establece la transparencia de la imagen
-                    contentScale = ContentScale.Crop // Ajusta cómo se escala la imagen
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp) // Espaciado interno de la Card
-                        .align(Alignment.BottomStart) // Alinea el Row en la parte inferior
-                    , verticalAlignment = Alignment.CenterVertically // Alineación vertical centrada
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.prest),
-                        contentDescription = "Imagen PC",  // Sólo una vez contentDescription
-                        modifier = Modifier.size(36.dp) // Tamaño del ícono
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el ícono y el texto
-
-                    TextButton(
-                        onClick = { onNavigate("registro-prestamo") }, // Usa onNavigate aquí
-                        colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFFFFFFF))
-                    ) {
-                        Text(
-                            text = "Prestamo de equipos",
-                            style = TextStyle(
-                                fontSize = 22.sp, // Aumenta el tamaño del texto
-                                fontWeight = FontWeight.Bold, // Cambia el peso de la fuente si lo deseas
-                                color = Color.Black // Color del texto (opcional)
+                            Text(
+                                text = "Descripción opcional",
+                                fontSize = 14.sp,
+                                color = Color.Black
                             )
-                        )
+                        }
                     }
-
                 }
             }
         }
 
-        Card(
-            modifier = Modifier
-                .widthIn(max = 300.dp) // Establece un ancho máximo para la Card
-                .heightIn(max = 100.dp)
-                .padding(8.dp), // Espaciado alrededor de la Card
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFE0E0E0)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        ) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Image(
-                    painter = painterResource(id = R.drawable.listar), // Reemplaza con tu recurso de imagen
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxSize() // Ocupa todo el espacio de la tarjeta
-                        .align(Alignment.Center) // Centra la imagen
-                        .clip(RoundedCornerShape(8.dp)) // Aplica bordes redondeados a la imagen
-                        .graphicsLayer(alpha = 0.7f), // Establece la transparencia de la imagen
-                    contentScale = ContentScale.Crop // Ajusta cómo se escala la imagen
-                )
+        // Espaciado
+        item { Spacer(modifier = Modifier.height(16.dp)) }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp) // Espaciado interno de la Card
-                        .align(Alignment.BottomStart) // Alinea el Row en la parte inferior
-                    , verticalAlignment = Alignment.CenterVertically // Alineación vertical centrada
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.regis),
-                        contentDescription = "Imagen PC",  // Sólo una vez contentDescription
-                        modifier = Modifier.size(36.dp) // Tamaño del ícono
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el ícono y el texto
-
-                    TextButton(
-                        onClick = { onNavigate("interfaz-listar") }, // Usa onNavigate aquí
-                        colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFFFFFFF))
-                    ) {
-                        Text(
-                            text = "Validacion de registros",
-                            style = TextStyle(
-                                fontSize = 22.sp, // Aumenta el tamaño del texto
-                                fontWeight = FontWeight.Bold, // Cambia el peso de la fuente si lo deseas
-                                color = Color.Black // Color del texto (opcional)
-                            )
-                        )
-                    }
-
-                }
-            }
-        }
-
-
-        Card(
-            modifier = Modifier
-                .widthIn(max = 300.dp) // Establece un ancho máximo para la Card
-                .heightIn(max = 100.dp)
-                .padding(8.dp), // Espaciado alrededor de la Card
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFE0E0E0)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-            //  border = BorderStroke(2.dp, Color.Gray) // Añade un borde gris a la Card
-        ) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Image(
-                    painter = painterResource(id = R.drawable.estudiante), // Reemplaza con tu recurso de imagen
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxSize() // Ocupa todo el espacio de la tarjeta
-                        .align(Alignment.Center) // Centra la imagen
-                        .clip(RoundedCornerShape(8.dp)) // Aplica bordes redondeados a la imagen
-                        .graphicsLayer(alpha = 0.7f), // Establece la transparencia de la imagen
-                    contentScale = ContentScale.Crop // Ajusta cómo se escala la imagen
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp) // Espaciado interno de la Card
-                        .align(Alignment.BottomStart) // Alinea el Row en la parte inferior
-                    , verticalAlignment = Alignment.CenterVertically // Alineación vertical centrada
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Info,
+        // Tarjetas principales
+        item {
+            Card(
+                modifier = Modifier
+                    .widthIn(max = 300.dp)
+                    .heightIn(max = 100.dp)
+                    .padding(8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFE0E0E0)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            ) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Image(
+                        painter = painterResource(id = R.drawable.equipos),
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp) // Tamaño del ícono
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(8.dp))
+                            .graphicsLayer(alpha = 0.7f),
+                        contentScale = ContentScale.Crop
                     )
-                    Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el ícono y el texto
-                    TextButton(
-                        onClick = { /* Navegar a Sección 1 */ },
-                        colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF2AA345))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .align(Alignment.BottomStart),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = "Otros")
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.pc),
+                            contentDescription = "Imagen PC",
+                            modifier = Modifier.size(36.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        TextButton(
+                            onClick = { onNavigate("registrosequipos") },
+                            colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFFFFFFF))
+                        ) {
+                            Text(
+                                text = "Registrar equipos",
+                                style = TextStyle(
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black
+                                )
+                            )
+                        }
                     }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.weight(1f))
+        item {
+            Card(
+                modifier = Modifier
+                    .widthIn(max = 300.dp)
+                    .heightIn(max = 100.dp)
+                    .padding(8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFE0E0E0)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            ) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Image(
+                        painter = painterResource(id = R.drawable.registrar),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(8.dp))
+                            .graphicsLayer(alpha = 0.7f),
+                        contentScale = ContentScale.Crop
+                    )
 
-        Button(
-            onClick = { onNavigate("Login") },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent, // Fondo transparente para el degradado
-                contentColor = Color.Black // Color del texto
-            ),
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .height(50.dp)
-                .width(150.dp)
-                .offset(y = (-32).dp) // Mueve el botón hacia arriba 16 dp
-                .shadow(elevation = 8.dp, shape = RoundedCornerShape(12.dp)) // Agrega sombra
-                .clip(RoundedCornerShape(12.dp)), // Bordes redondeados
-            shape = RoundedCornerShape(12.dp) // Bordes redondeados
-        ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .align(Alignment.BottomStart),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.soli),
+                            contentDescription = "Imagen PC",
+                            modifier = Modifier.size(36.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        TextButton(
+                            onClick = { onNavigate("registrosolicitante") },
+                            colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFFFFFFF))
+                        ) {
+                            Text(
+                                text = "Registrar solicitantes",
+                                style = TextStyle(
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
+            Card(
+                modifier = Modifier
+                    .widthIn(max = 300.dp)
+                    .heightIn(max = 100.dp)
+                    .padding(8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFE0E0E0)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            ) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Image(
+                        painter = painterResource(id = R.drawable.prestar),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(8.dp))
+                            .graphicsLayer(alpha = 0.7f),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .align(Alignment.BottomStart),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.prest),
+                            contentDescription = "Imagen PC",
+                            modifier = Modifier.size(36.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        TextButton(
+                            onClick = { onNavigate("registro-prestamo") },
+                            colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFFFFFFF))
+                        ) {
+                            Text(
+                                text = "Préstamo de equipos",
+                                style = TextStyle(
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Más tarjetas
+        item {
+            Card(
+                modifier = Modifier
+                    .widthIn(max = 300.dp)
+                    .heightIn(max = 100.dp)
+                    .padding(8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFE0E0E0)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            ) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Image(
+                        painter = painterResource(id = R.drawable.listar),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(8.dp))
+                            .graphicsLayer(alpha = 0.7f),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .align(Alignment.BottomStart),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.regis),
+                            contentDescription = "Imagen PC",
+                            modifier = Modifier.size(36.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        TextButton(
+                            onClick = { onNavigate("interfaz-listar") },
+                            colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFFFFFFF))
+                        ) {
+                            Text(
+                                text = "Validación de registros",
+                                style = TextStyle(
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+
+        item {
+            Spacer(modifier = Modifier.height(100.dp)) // Espaciado fijo
+        }
+
+        // Botón de cierre de sesión con padding para bajarlo
+        item {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(
-                        Brush.linearGradient(
-                            colors = listOf(
-                                Color(0xFF57A742),
-                                Color(0xFF82CE82)
-                            ), // Degradado de verde
-                            start = Offset(0f, 0f),
-                            end = Offset(1f, 1f)
-                        ),
-                        shape = RoundedCornerShape(12.dp) // Bordes redondeados en el degradado
-                    )
+                    .padding(bottom = 32.dp), // Padding inferior para mover el botón hacia abajo
+                contentAlignment = Alignment.BottomCenter // Alineación inferior centrada
             ) {
-                Text(
-                    text = "Cerrar Sesión",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold, // Negrita para mayor énfasis
+                Button(
+                    onClick = { onNavigate("Login") },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color.Black
+                    ),
                     modifier = Modifier
-                        .align(Alignment.Center) // Centra el texto
-                        .padding(4.dp) // Añade un poco de espaciado interno
-                )
+                        .height(50.dp)
+                        .width(150.dp)
+                        .shadow(elevation = 8.dp, shape = RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(12.dp)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.linearGradient(
+                                    colors = listOf(
+                                        Color(0xFF57A742),
+                                        Color(0xFF82CE82)
+                                    ),
+                                    start = Offset(0f, 0f),
+                                    end = Offset(1f, 1f)
+                                ),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                    ) {
+                        Text(
+                            text = "Cerrar Sesión",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .padding(4.dp)
+                        )
+                    }
+                }
             }
         }
     }

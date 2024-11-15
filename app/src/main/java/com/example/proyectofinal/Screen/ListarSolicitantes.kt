@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -54,6 +55,8 @@ fun ListarSolicitantes(
     var correo by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
     var idUsuarioSeleccionado by remember { mutableStateOf<Int?>(null) } // ID seleccionado en el Dropdown
+
+    var query by remember { mutableStateOf("") }
 
     // Cargar los solicitantes y usuarios disponibles
     LaunchedEffect(Unit) {
@@ -136,7 +139,9 @@ fun ListarSolicitantes(
                 }
             },
             content = { paddingValues ->
-                Box(modifier = Modifier.fillMaxSize()) {
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
                     Image(
                         painter = painterResource(id = R.drawable.fondoprincipal),
                         contentDescription = null,
@@ -148,201 +153,244 @@ fun ListarSolicitantes(
                             .fillMaxSize()
                             .background(Color.White.copy(alpha = 0.6f))
                     )
-
-                    LazyColumn(
+                    Column(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(paddingValues)
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        items(solicitantesConUsuarios) { solicitanteConUsuario ->
-                            val solicitante = solicitanteConUsuario.solicitante
-                            val usuario = solicitanteConUsuario.usuario
-
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                elevation = CardDefaults.cardElevation(100.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = Color.White.copy(alpha = 0.5f)// Color blanco para la tarjeta
+                        // Barra de búsqueda fuera de iniciosup
+                        OutlinedTextField(
+                            value = query,
+                            onValueChange = { query = it },
+                            label = { Text("Buscar") },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = "Buscar",
+                                    tint = Color.Black
                                 )
-                            ){
-                                Row(
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                        .fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(
-                                            text = "Nombre: ${solicitante.nombre} ${solicitante.apellido}",
-                                            fontSize = 18.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Text(
-                                            text = "Correo: ${solicitante.correo}",
-                                            fontSize = 16.sp
-                                        )
-                                        Text(
-                                            text = "Teléfono: ${solicitante.telefono}",
-                                            fontSize = 14.sp
-                                        )
-                                        Text(
-                                            text = "Usuario Asignado: ${usuario.nombres} ${usuario.apellidos}",
-                                            fontSize = 14.sp,
-                                            color = Color.Gray
-                                        )
-                                    }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp), // Relleno para que no quede pegado
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = Color.Black, // Borde negro cuando está enfocado
+                                unfocusedBorderColor = Color.Black // Borde negro cuando no está enfocado
+                            )
+                        )
 
-                                    // Íconos de Editar y Eliminar a la derecha
+                        // Listado de usuarios
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            items(solicitantesConUsuarios.filter {
+                                it.solicitante.nombre.contains(query, ignoreCase = true) ||
+                                        it.solicitante.apellido.contains(query, ignoreCase = true) ||
+                                        it.solicitante.correo.contains(query, ignoreCase = true) ||
+                                        it.solicitante.telefono.contains(query, ignoreCase = true)
+                            }) { solicitanteConUsuario ->
+                                val solicitante = solicitanteConUsuario.solicitante
+                                val usuario = solicitanteConUsuario.usuario
+
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    elevation = CardDefaults.cardElevation(100.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = Color.White.copy(alpha = 0.5f) // Color blanco para la tarjeta
+                                    )
+                                ) {
                                     Row(
                                         modifier = Modifier
-                                            .padding(start = 16.dp)
-                                            .align(Alignment.CenterVertically),
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                            .padding(16.dp)
+                                            .fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = "Editar",
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(
+                                                text = "Nombre: ${solicitante.nombre} ${solicitante.apellido}",
+                                                fontSize = 18.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Text(
+                                                text = "Correo: ${solicitante.correo}",
+                                                fontSize = 16.sp
+                                            )
+                                            Text(
+                                                text = "Teléfono: ${solicitante.telefono}",
+                                                fontSize = 14.sp
+                                            )
+                                            Text(
+                                                text = "Usuario Asignado: ${usuario.nombres} ${usuario.apellidos}",
+                                                fontSize = 14.sp,
+                                                color = Color.Gray
+                                            )
+                                        }
+
+                                        // Íconos de Editar y Eliminar a la derecha
+                                        Row(
                                             modifier = Modifier
-                                                .size(24.dp)
-                                                .clickable {
-                                                    solicitanteAEditar = solicitanteConUsuario
-                                                    nombre = solicitante.nombre
-                                                    apellido = solicitante.apellido
-                                                    correo = solicitante.correo
-                                                    telefono = solicitante.telefono
-                                                    idUsuarioSeleccionado = usuario.idUsuario
-                                                    mostrarDialogoEditar = true
-                                                },
-                                            tint = Color.Black
-                                        )
-                                        Icon(
-                                            imageVector = Icons.Default.Delete,
-                                            contentDescription = "Eliminar",
-                                            modifier = Modifier
-                                                .size(24.dp)
-                                                .clickable {
-                                                    scope.launch {
-                                                        solicitanteRepository.eliminar(solicitante)
-                                                        solicitantesConUsuarios = solicitanteRepository.obtenerSolicitantesConUsuarios()
-                                                    }
-                                                },
-                                            tint = Color(color = 0xFFE20000)
-                                        )
+                                                .padding(start = 16.dp)
+                                                .align(Alignment.CenterVertically),
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Editar",
+                                                modifier = Modifier
+                                                    .size(24.dp)
+                                                    .clickable {
+                                                        solicitanteAEditar = solicitanteConUsuario
+                                                        nombre = solicitante.nombre
+                                                        apellido = solicitante.apellido
+                                                        correo = solicitante.correo
+                                                        telefono = solicitante.telefono
+                                                        idUsuarioSeleccionado = usuario.idUsuario
+                                                        mostrarDialogoEditar = true
+                                                    },
+                                                tint = Color.Black
+                                            )
+                                            Icon(
+                                                imageVector = Icons.Default.Delete,
+                                                contentDescription = "Eliminar",
+                                                modifier = Modifier
+                                                    .size(24.dp)
+                                                    .clickable {
+                                                        scope.launch {
+                                                            solicitanteRepository.eliminar(
+                                                                solicitante
+                                                            )
+                                                            solicitantesConUsuarios =
+                                                                solicitanteRepository.obtenerSolicitantesConUsuarios()
+                                                        }
+                                                    },
+                                                tint = Color(color = 0xFFE20000)
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    if (mostrarDialogoEditar && solicitanteAEditar != null) {
-                        AlertDialog(
-                            onDismissRequest = { mostrarDialogoEditar = false },
-                            title = { Text("Editar Solicitante") },
-                            text = {
-                                Column {
-                                    Text("Modifica los campos del solicitante aquí")
+                        if (mostrarDialogoEditar && solicitanteAEditar != null) {
+                            AlertDialog(
+                                onDismissRequest = { mostrarDialogoEditar = false },
+                                title = { Text("Editar Solicitante") },
+                                text = {
+                                    Column {
+                                        Text("Modifica los campos del solicitante aquí")
 
-                                    TextField(
-                                        value = nombre,
-                                        onValueChange = { nombre = it },
-                                        label = { Text("Nombre") }
-                                    )
-                                    TextField(
-                                        value = apellido,
-                                        onValueChange = { apellido = it },
-                                        label = { Text("Apellido") }
-                                    )
-                                    TextField(
-                                        value = correo,
-                                        onValueChange = { correo = it },
-                                        label = { Text("Correo") }
-                                    )
-                                    TextField(
-                                        value = telefono,
-                                        onValueChange = { telefono = it },
-                                        label = { Text("Teléfono") }
-                                    )
-
-                                    // Descripción para el campo de usuario ingresado por
-                                    Text(
-                                        text = "Ingresado por:",
-                                        modifier = Modifier.padding(top = 8.dp)
-                                    )
-
-                                    // Dropdown menu estilizado
-                                    var expanded by remember { mutableStateOf(false) }
-
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(top = 4.dp)
-                                            .background(Color.Transparent)
-                                            .border(
-                                                BorderStroke(1.dp, Color.Gray),
-                                                shape = MaterialTheme.shapes.small
-                                            )
-                                            .clip(MaterialTheme.shapes.small)
-                                            .clickable { expanded = true }
-                                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                                    ) {
-                                        Text(
-                                            text = usuariosDisponibles.find { it.idUsuario == idUsuarioSeleccionado }
-                                                ?.let { "${it.nombres} ${it.apellidos}" }
-                                                ?: "Seleccionar Usuario",
-                                            color = Color.Black
+                                        TextField(
+                                            value = nombre,
+                                            onValueChange = { nombre = it },
+                                            label = { Text("Nombre") }
+                                        )
+                                        TextField(
+                                            value = apellido,
+                                            onValueChange = { apellido = it },
+                                            label = { Text("Apellido") }
+                                        )
+                                        TextField(
+                                            value = correo,
+                                            onValueChange = { correo = it },
+                                            label = { Text("Correo") }
+                                        )
+                                        TextField(
+                                            value = telefono,
+                                            onValueChange = { telefono = it },
+                                            label = { Text("Teléfono") }
                                         )
 
-                                        DropdownMenu(
-                                            expanded = expanded,
-                                            onDismissRequest = { expanded = false }
-                                        ) {
-                                            usuariosDisponibles.forEach { usuario ->
-                                                DropdownMenuItem(
-                                                    text = { Text("${usuario.nombres} ${usuario.apellidos}") },
-                                                    onClick = {
-                                                        idUsuarioSeleccionado = usuario.idUsuario
-                                                        expanded = false
-                                                    }
+                                        // Descripción para el campo de usuario ingresado por
+                                        Text(
+                                            text = "Ingresado por:",
+                                            modifier = Modifier.padding(top = 8.dp)
+                                        )
+
+                                        // Dropdown menu estilizado
+                                        var expanded by remember { mutableStateOf(false) }
+
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(top = 4.dp)
+                                                .background(Color.Transparent)
+                                                .border(
+                                                    BorderStroke(1.dp, Color.Gray),
+                                                    shape = MaterialTheme.shapes.small
                                                 )
+                                                .clip(MaterialTheme.shapes.small)
+                                                .clickable { expanded = true }
+                                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                        ) {
+                                            Text(
+                                                text = usuariosDisponibles.find { it.idUsuario == idUsuarioSeleccionado }
+                                                    ?.let { "${it.nombres} ${it.apellidos}" }
+                                                    ?: "Seleccionar Usuario",
+                                                color = Color.Black
+                                            )
+
+                                            DropdownMenu(
+                                                expanded = expanded,
+                                                onDismissRequest = { expanded = false }
+                                            ) {
+                                                usuariosDisponibles.forEach { usuario ->
+                                                    DropdownMenuItem(
+                                                        text = { Text("${usuario.nombres} ${usuario.apellidos}") },
+                                                        onClick = {
+                                                            idUsuarioSeleccionado =
+                                                                usuario.idUsuario
+                                                            expanded = false
+                                                        }
+                                                    )
+                                                }
                                             }
                                         }
                                     }
-                                }
-                            },
-                            confirmButton = {
-                                IconButton(onClick = {
-                                    val solicitanteModificado = solicitanteAEditar?.solicitante?.copy(
-                                        nombre = nombre,
-                                        apellido = apellido,
-                                        correo = correo,
-                                        telefono = telefono,
-                                        idUsuario = idUsuarioSeleccionado ?: 0
-                                    )
+                                },
+                                confirmButton = {
+                                    IconButton(onClick = {
+                                        val solicitanteModificado =
+                                            solicitanteAEditar?.solicitante?.copy(
+                                                nombre = nombre,
+                                                apellido = apellido,
+                                                correo = correo,
+                                                telefono = telefono,
+                                                idUsuario = idUsuarioSeleccionado ?: 0
+                                            )
 
-                                    if (solicitanteModificado != null) {
-                                        scope.launch {
-                                            solicitanteRepository.actualizar(solicitanteModificado)
-                                            solicitantesConUsuarios = solicitanteRepository.obtenerSolicitantesConUsuarios()
+                                        if (solicitanteModificado != null) {
+                                            scope.launch {
+                                                solicitanteRepository.actualizar(
+                                                    solicitanteModificado
+                                                )
+                                                solicitantesConUsuarios =
+                                                    solicitanteRepository.obtenerSolicitantesConUsuarios()
+                                            }
                                         }
+                                        mostrarDialogoEditar = false
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Done,
+                                            contentDescription = "Guardar"
+                                        )
                                     }
-                                    mostrarDialogoEditar = false
-                                }) {
-                                    Icon(imageVector = Icons.Default.Done, contentDescription = "Guardar")
+                                },
+                                dismissButton = {
+                                    IconButton(onClick = { mostrarDialogoEditar = false }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Close,
+                                            contentDescription = "Cancelar"
+                                        )
+                                    }
                                 }
-                            },
-                            dismissButton = {
-                                IconButton(onClick = { mostrarDialogoEditar = false }) {
-                                    Icon(imageVector = Icons.Default.Close, contentDescription = "Cancelar")
-                                }
-                            }
-                        )
+                            )
+                        }
                     }
-
-
                 }
             }
         )

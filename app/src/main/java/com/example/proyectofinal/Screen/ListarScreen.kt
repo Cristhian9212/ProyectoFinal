@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -124,71 +125,79 @@ fun ListarScreen(navController: NavController) {
                             .background(Color.White.copy(alpha = 0.6f))
                     )
 
-                    Column(
+                    LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(paddingValues)
                             .padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.listar),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(200.dp)
-                                .padding(top = 10.dp)
-                                .clip(RoundedCornerShape(16.dp)),
-                            contentScale = ContentScale.Crop
-                        )
-
-                        Spacer(modifier = Modifier.height(25.dp))
-
-                        // Estilo común para las tarjetas, con mayor tamaño
-                        val cardModifier = Modifier
-                            .fillMaxWidth()
-                            .height(80.dp) // Aumenta la altura de la tarjeta
-                            .padding(vertical = 10.dp)
-                            .shadow(elevation = 4.dp, shape = RoundedCornerShape(16.dp))
-
-                        // Primera tarjeta
-                        OutlinedCard(
-                            modifier = cardModifier,
-                            shape = RoundedCornerShape(16.dp),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-                            colors = CardDefaults.outlinedCardColors(
-                                containerColor = Color.White.copy(alpha = 0.9f)
+                        item {
+                            Image(
+                                painter = painterResource(id = R.drawable.listar),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(200.dp)
+                                    .padding(top = 10.dp)
+                                    .clip(RoundedCornerShape(16.dp)),
+                                contentScale = ContentScale.Crop
                             )
-                        ) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
+                        }
+
+                        item {
+                            // Estilo común para las tarjetas, con mayor tamaño
+                            val cardModifier = Modifier
+                                .fillMaxWidth()
+                                .height(80.dp) // Aumenta la altura de la tarjeta
+                                .padding(vertical = 10.dp)
+                                .shadow(elevation = 4.dp, shape = RoundedCornerShape(16.dp))
+
+                            // Primera tarjeta
+                            OutlinedCard(
+                                modifier = cardModifier,
+                                shape = RoundedCornerShape(16.dp),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                                colors = CardDefaults.outlinedCardColors(
+                                    containerColor = Color.White.copy(alpha = 0.9f)
+                                )
                             ) {
-                                TextButton(
-                                    onClick = { onNavigate("interfaz-listarusuarios") },
-                                    modifier = Modifier.fillMaxWidth()
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    Text(
-                                        text = "Listado de usuarios",
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Medium,
-                                        color = Color.Black // Color del texto cambiado a negro
-                                    )
+                                    TextButton(
+                                        onClick = { onNavigate("interfaz-listarusuarios") },
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Text(
+                                            text = "Listado de usuarios",
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            color = Color.Black // Color del texto cambiado a negro
+                                        )
+                                    }
                                 }
                             }
                         }
 
+                        item {
+                            // Segunda tarjeta
 
-                        // Segunda tarjeta
-                        OutlinedCard(
-                            modifier = cardModifier,
-                            shape = RoundedCornerShape(16.dp),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-                            colors = CardDefaults.outlinedCardColors(
-                                containerColor = Color.White.copy(alpha = 0.9f)
-                            )
-                        )
-                            {
+                            val cardModifier = Modifier
+                                .fillMaxWidth()
+                                .height(80.dp) // Aumenta la altura de la tarjeta
+                                .padding(vertical = 10.dp)
+                                .shadow(elevation = 4.dp, shape = RoundedCornerShape(16.dp))
+
+                            OutlinedCard(
+                                modifier = cardModifier,
+                                shape = RoundedCornerShape(16.dp),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                                colors = CardDefaults.outlinedCardColors(
+                                    containerColor = Color.White.copy(alpha = 0.9f)
+                                )
+                            ) {
                                 Box(
                                     modifier = Modifier.fillMaxSize(),
                                     contentAlignment = Alignment.Center
@@ -206,59 +215,75 @@ fun ListarScreen(navController: NavController) {
                                     }
                                 }
                             }
+                        }
 
-                        // Tercera tarjeta
-                        OutlinedCard(
-                            modifier = cardModifier,
-                            shape = RoundedCornerShape(16.dp),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-                            colors = CardDefaults.outlinedCardColors(
-                                containerColor = Color.White.copy(alpha = 0.9f)
+                        item {
+                            // Tercera tarjeta
 
-                            )
-                        )
-                        {
-                           Box(
-                               modifier = Modifier.fillMaxSize(),
-                               contentAlignment = Alignment.Center
-                           ) {
-                            TextButton(
-                                onClick = { onNavigate("interfaz-listarcomputadores") },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = "Listado de computadores",
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = Color.Black
+                            val cardModifier = Modifier
+                                .fillMaxWidth()
+                                .height(80.dp) // Aumenta la altura de la tarjeta
+                                .padding(vertical = 10.dp)
+                                .shadow(elevation = 4.dp, shape = RoundedCornerShape(16.dp))
+
+                            OutlinedCard(
+                                modifier = cardModifier,
+                                shape = RoundedCornerShape(16.dp),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                                colors = CardDefaults.outlinedCardColors(
+                                    containerColor = Color.White.copy(alpha = 0.9f)
                                 )
+                            ) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    TextButton(
+                                        onClick = { onNavigate("interfaz-listarcomputadores") },
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Text(
+                                            text = "Listado de computadores",
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            color = Color.Black
+                                        )
+                                    }
+                                }
                             }
                         }
-                        }
 
-                        // Cuarta tarjeta
-                        OutlinedCard(
-                            modifier = cardModifier,
-                            shape = RoundedCornerShape(16.dp),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-                            colors = CardDefaults.outlinedCardColors(
-                                containerColor = Color.White.copy(alpha = 0.9f)
-                            )
-                        ) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
+                        item {
+                            // Cuarta tarjeta
+                            val cardModifier = Modifier
+                                .fillMaxWidth()
+                                .height(80.dp) // Aumenta la altura de la tarjeta
+                                .padding(vertical = 10.dp)
+                                .shadow(elevation = 4.dp, shape = RoundedCornerShape(16.dp))
+
+                            OutlinedCard(
+                                modifier = cardModifier,
+                                shape = RoundedCornerShape(16.dp),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                                colors = CardDefaults.outlinedCardColors(
+                                    containerColor = Color.White.copy(alpha = 0.9f)
+                                )
                             ) {
-                                TextButton(
-                                    onClick = { onNavigate("interfaz-listarprestamos") },
-                                    modifier = Modifier.fillMaxWidth()
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    Text(
-                                        text = "Listado de préstamos",
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Medium,
-                                        color = Color.Black
-                                    )
+                                    TextButton(
+                                        onClick = { onNavigate("interfaz-listarprestamos") },
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Text(
+                                            text = "Listado de préstamos",
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            color = Color.Black
+                                        )
+                                    }
                                 }
                             }
                         }

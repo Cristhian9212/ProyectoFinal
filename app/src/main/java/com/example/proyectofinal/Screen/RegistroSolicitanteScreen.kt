@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -50,7 +51,7 @@ fun RegistroSolicitanteScreen(
     var errorMessage by remember { mutableStateOf("") } // Para los mensajes de error o éxito
     var correoError by remember { mutableStateOf("") }
 
-// Expresión regular para validar el formato de correo electrónico
+    // Expresión regular para validar el formato de correo electrónico
     val correoRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
 
     var idUsuario by remember { mutableStateOf<Int?>(null) }
@@ -138,7 +139,8 @@ fun RegistroSolicitanteScreen(
                         ),
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
-                }},
+                }
+            },
             snackbarHost = {
                 SnackbarHost(hostState = snackbarHostState) { data ->
                     Snackbar(
@@ -170,212 +172,216 @@ fun RegistroSolicitanteScreen(
                 }
             },
             content = { paddingValues ->
-                Column(
+                LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
                         .padding(horizontal = 32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.registrar),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(200.dp)
-                                .align(Alignment.TopCenter)
-                                .offset(y = (-10).dp)
-                                .clip(RoundedCornerShape(16.dp)),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 50.dp)
-                            .heightIn(max = 600.dp)
-                            .wrapContentHeight(),
-                        shape = RoundedCornerShape(16.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.8f))
-                    ) {
-                        Column(
+                    item {
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
-                                .verticalScroll(rememberScrollState()),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
                         ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.registrar),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(200.dp)
+                                    .align(Alignment.TopCenter)
+                                    .offset(y = (-10).dp)
+                                    .clip(RoundedCornerShape(16.dp)),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
 
-                            Box(
+                    item {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 50.dp)
+                                .heightIn(max = 600.dp)
+                                .wrapContentHeight(),
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.8f))
+                        ) {
+                            Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(60.dp)
-                                    .padding(top = 4.dp)
-                                    .background(Color.Transparent)
-                                    .border(BorderStroke(1.dp, Color(0xFF4CAF50)), shape = MaterialTheme.shapes.small)
-                                    .clip(MaterialTheme.shapes.small)
-                                    .clickable { expanded = true } // Manejo del estado de expansión
-                                    .padding(vertical = 10.dp)
+                                    .padding(16.dp)
+                                    .verticalScroll(rememberScrollState()),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(10.dp)
                             ) {
-                                // Texto para el usuario seleccionado o texto por defecto si no se ha seleccionado ninguno
-                                Text(
-                                    text = selectedUsuario?.let { "${it.nombres} ${it.apellidos}" } ?: "Seleccionar Usuario",
-                                    color = Color.Gray,
-                                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 10.dp)
-                                )
 
-                                // DropdownMenu para desplegar las opciones de usuarios
-                                DropdownMenu(
-                                    expanded = expanded,
-                                    onDismissRequest = { expanded = false },
+                                Box(
                                     modifier = Modifier
-                                        .fillMaxWidth() // Asegura que el DropdownMenu tenga el mismo ancho que el Box
-                                        .background(Color.White)
-                                        .offset(y = 4.dp) // Desplaza el menú justo debajo del Box sin espacios grandes
+                                        .fillMaxWidth()
+                                        .height(60.dp)
+                                        .padding(top = 4.dp)
+                                        .background(Color.Transparent)
+                                        .border(BorderStroke(1.dp, Color(0xFF4CAF50)), shape = MaterialTheme.shapes.small)
+                                        .clip(MaterialTheme.shapes.small)
+                                        .clickable { expanded = true } // Manejo del estado de expansión
+                                        .padding(vertical = 10.dp)
                                 ) {
-                                    // Iterar sobre la lista de usuarios para mostrar cada uno como opción
-                                    usuarios.value.forEach { usuario ->
-                                        DropdownMenuItem(
-                                            text = { Text("${usuario.nombres} ${usuario.apellidos}") },
-                                            onClick = {
-                                                selectedUsuario = usuario
-                                                idUsuario = usuario.idUsuario
-                                                expanded = false // Cerrar menú después de seleccionar
-                                            }
-                                        )
-                                    }
-                                }
-                            }
+                                    Text(
+                                        text = selectedUsuario?.let { "${it.nombres} ${it.apellidos}" } ?: "Seleccionar Usuario",
+                                        color = Color.Gray,
+                                        modifier = Modifier.padding(horizontal = 15.dp, vertical = 10.dp)
+                                    )
 
-                            TextField(
-                                value = nombre,
-                                onValueChange = { nombre = it },
-                                label = { Text("Nombre") },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
-                                    .border(1.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)),
-                                colors = TextFieldDefaults.textFieldColors(
-                                    focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent,
-                                    focusedLabelColor = Color(0xFF4CAF50),
-                                    unfocusedLabelColor = Color.Gray,
-                                    containerColor = Color.Transparent,
-                                    cursorColor = Color(0xFF4CAF50)
-                                )
-                            )
-
-                            TextField(
-                                value = apellido,
-                                onValueChange = { apellido = it },
-                                label = { Text("Apellido") },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
-                                    .border(1.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)),
-                                colors = TextFieldDefaults.textFieldColors(
-                                    focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent,
-                                    focusedLabelColor = Color(0xFF4CAF50),
-                                    unfocusedLabelColor = Color.Gray,
-                                    containerColor = Color.Transparent,
-                                    cursorColor = Color(0xFF4CAF50)
-                                )
-                            )
-
-                            TextField(
-                                value = correo,
-                                onValueChange = {
-                                    correo = it
-                                    correoError = if (correoRegex.matches(it)) "" else "Correo no válido"
-                                },
-                                label = { Text("Correo") },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
-                                    .border(1.dp, if (correoError.isEmpty()) Color(0xFF4CAF50) else Color.Red, RoundedCornerShape(8.dp)),
-                                colors = TextFieldDefaults.textFieldColors(
-                                    focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent,
-                                    focusedLabelColor = if (correoError.isEmpty()) Color(0xFF4CAF50) else Color.Red,
-                                    unfocusedLabelColor = Color.Gray,
-                                    containerColor = Color.Transparent,
-                                    cursorColor = Color(0xFF4CAF50)
-                                ),
-                                isError = correoError.isNotEmpty()
-                            )
-
-// Mostrar mensaje de error si el correo es inválido
-                            if (correoError.isNotEmpty()) {
-                                Text(
-                                    text = correoError,
-                                    color = Color.Red,
-                                    fontSize = 12.sp,
-                                    modifier = Modifier.padding(top = 4.dp)
-                                )
-                            }
-
-                            TextField(
-                                value = telefono,
-                                onValueChange = { telefono = it },
-                                label = { Text("Teléfono") },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
-                                    .border(1.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)),
-                                colors = TextFieldDefaults.textFieldColors(
-                                    focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent,
-                                    focusedLabelColor = Color(0xFF4CAF50),
-                                    unfocusedLabelColor = Color.Gray,
-                                    containerColor = Color.Transparent,
-                                    cursorColor = Color(0xFF4CAF50)
-                                ),
-                                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number) // Teclado numérico
-                            )
-
-
-                            Button(
-                                onClick = {
-                                    // Verifica que todos los campos estén completos y que el correo sea válido
-                                    if (nombre.isEmpty() || apellido.isEmpty() || correo.isEmpty() || telefono.isEmpty()) {
-                                        errorMessage = "Todos los campos son obligatorios."
-                                    } else if (correoError.isNotEmpty()) {
-                                        // Mensaje de error específico para correo no válido
-                                        errorMessage = "Por favor, ingresa un correo válido."
-                                    } else {
-                                        // Guardar sólo si no hay error en el correo
-                                        idUsuario?.let { idUsuario ->
-                                            scope.launch {
-                                                onSaveEquipo(nombre.trim(), apellido.trim(), correo.trim(), telefono.trim(), idUsuario)
-                                                nombre = ""
-                                                apellido = ""
-                                                correo = ""
-                                                telefono = ""
-                                                selectedUsuario = null
-                                                errorMessage = "Estudiante registrado con éxito."
-                                            }
+                                    // DropdownMenu para desplegar las opciones de usuarios
+                                    DropdownMenu(
+                                        expanded = expanded,
+                                        onDismissRequest = { expanded = false },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(Color.White)
+                                            .offset(y = 4.dp)
+                                    ) {
+                                        usuarios.value.forEach { usuario ->
+                                            DropdownMenuItem(
+                                                text = { Text("${usuario.nombres} ${usuario.apellidos}") },
+                                                onClick = {
+                                                    selectedUsuario = usuario
+                                                    idUsuario = usuario.idUsuario
+                                                    expanded = false
+                                                }
+                                            )
                                         }
                                     }
-                                },
-                                enabled = correoError.isEmpty(), // Desactiva el botón si el correo es inválido
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 16.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (correoError.isEmpty()) Color(0xFF4CAF50) else Color.Gray // Cambia el color si está deshabilitado
+                                }
+
+                                TextField(
+                                    value = nombre,
+                                    onValueChange = { nombre = it },
+                                    label = { Text("Nombre") },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
+                                        .border(1.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)),
+                                    colors = TextFieldDefaults.textFieldColors(
+                                        focusedIndicatorColor = Color.Transparent,
+                                        unfocusedIndicatorColor = Color.Transparent,
+                                        focusedLabelColor = Color(0xFF4CAF50),
+                                        unfocusedLabelColor = Color.Gray,
+                                        containerColor = Color.Transparent,
+                                        cursorColor = Color(0xFF4CAF50)
+                                    )
                                 )
-                            ) {
-                                Text("Guardar", fontSize = 20.sp, color = Color.White)
+
+                                TextField(
+                                    value = apellido,
+                                    onValueChange = { apellido = it },
+                                    label = { Text("Apellido") },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
+                                        .border(1.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)),
+                                    colors = TextFieldDefaults.textFieldColors(
+                                        focusedIndicatorColor = Color.Transparent,
+                                        unfocusedIndicatorColor = Color.Transparent,
+                                        focusedLabelColor = Color(0xFF4CAF50),
+                                        unfocusedLabelColor = Color.Gray,
+                                        containerColor = Color.Transparent,
+                                        cursorColor = Color(0xFF4CAF50)
+                                    )
+                                )
+
+                                TextField(
+                                    value = correo,
+                                    onValueChange = {
+                                        correo = it
+                                        correoError = if (it.isNotEmpty() && !it.matches(correoRegex)) {
+                                            "Correo no válido"
+                                        } else {
+                                            ""
+                                        }
+                                    },
+                                    label = { Text("Correo Electrónico") },
+                                    isError = correoError.isNotEmpty(),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
+                                        .border(1.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)),
+                                    keyboardOptions = KeyboardOptions.Default.copy(
+                                        keyboardType = KeyboardType.Email
+                                    ),
+                                    colors = TextFieldDefaults.textFieldColors(
+                                        focusedIndicatorColor = Color.Transparent,
+                                        unfocusedIndicatorColor = Color.Transparent,
+                                        focusedLabelColor = Color(0xFF4CAF50),
+                                        unfocusedLabelColor = Color.Gray,
+                                        containerColor = Color.Transparent,
+                                        cursorColor = Color(0xFF4CAF50)
+                                    )
+                                )
+
+                                if (correoError.isNotEmpty()) {
+                                    Text(
+                                        text = correoError,
+                                        color = Color.Red,
+                                        fontSize = 14.sp
+                                    )
+                                }
+
+                                TextField(
+                                    value = telefono,
+                                    onValueChange = { telefono = it },
+                                    label = { Text("Teléfono") },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
+                                        .border(1.dp, Color(0xFF4CAF50), RoundedCornerShape(8.dp)),
+                                    colors = TextFieldDefaults.textFieldColors(
+                                        focusedIndicatorColor = Color.Transparent,
+                                        unfocusedIndicatorColor = Color.Transparent,
+                                        focusedLabelColor = Color(0xFF4CAF50),
+                                        unfocusedLabelColor = Color.Gray,
+                                        containerColor = Color.Transparent,
+                                        cursorColor = Color(0xFF4CAF50)
+                                    )
+                                )
+
+                                Button(
+                                    onClick = {
+                                        // Verifica que todos los campos estén completos y que el correo sea válido
+                                        if (nombre.isEmpty() || apellido.isEmpty() || correo.isEmpty() || telefono.isEmpty()) {
+                                            errorMessage = "Todos los campos son obligatorios."
+                                        } else if (correoError.isNotEmpty()) {
+                                            // Mensaje de error específico para correo no válido
+                                            errorMessage = "Por favor, ingresa un correo válido."
+                                        } else {
+                                            // Guardar sólo si no hay error en el correo
+                                            idUsuario?.let { idUsuario ->
+                                                scope.launch {
+                                                    onSaveEquipo(nombre.trim(), apellido.trim(), correo.trim(), telefono.trim(), idUsuario)
+                                                    nombre = ""
+                                                    apellido = ""
+                                                    correo = ""
+                                                    telefono = ""
+                                                    selectedUsuario = null
+                                                    errorMessage = "Estudiante registrado con éxito."
+                                                }
+                                            }
+                                        }
+                                    },
+                                    enabled = correoError.isEmpty(), // Desactiva el botón si el correo es inválido
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 16.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = if (correoError.isEmpty()) Color(0xFF4CAF50) else Color.Gray // Cambia el color si está deshabilitado
+                                    )
+                                ) {
+                                    Text("Guardar", fontSize = 20.sp, color = Color.White)
+                                }
                             }
                         }
                     }

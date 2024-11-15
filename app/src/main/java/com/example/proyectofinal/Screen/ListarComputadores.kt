@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -41,6 +42,9 @@ fun ListarComputadores(navController: NavController, computadorRepository: Compu
     var modelo by remember { mutableStateOf("") }
     var numeroSerie by remember { mutableStateOf("") }
     var estado by remember { mutableStateOf("") }
+
+    // Estado para el filtro de búsqueda
+    var query by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         computadores = computadorRepository.obtenerTodosLosComputadores()
@@ -136,153 +140,192 @@ fun ListarComputadores(navController: NavController, computadorRepository: Compu
                             .fillMaxSize()
                             .background(Color.White.copy(alpha = 0.6f))
                     )
-
-                    // Contenido en primer plano
-                    LazyColumn(
+                    Column(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(paddingValues)
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        items(computadores) { computador ->
-                            var iconVisible by remember { mutableStateOf(false) }
-
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                elevation = CardDefaults.cardElevation(100.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = Color.White.copy(alpha = 0.5f)// Color blanco para la tarjeta
+                        OutlinedTextField(
+                            value = query,
+                            onValueChange = { query = it },
+                            label = { Text("Buscar") },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = "Buscar",
+                                    tint = Color.Black
                                 )
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                        .fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    // Información del computador
-                                    Column(
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Text(
-                                            text = "Marca: ${computador.marca}",
-                                            fontSize = 18.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Text(
-                                            text = "Modelo: ${computador.modelo}",
-                                            fontSize = 16.sp
-                                        )
-                                        Text(
-                                            text = "Número de Serie: ${computador.numeroSerie}",
-                                            fontSize = 14.sp
-                                        )
-                                        Text(
-                                            text = "Estado: ${computador.estado}",
-                                            fontSize = 14.sp
-                                        )
-                                    }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp), // Relleno para que no quede pegado
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = Color.Black, // Borde negro cuando está enfocado
+                                unfocusedBorderColor = Color.Black // Borde negro cuando no está enfocado
+                            )
+                        )
 
-                                    // Íconos de editar y eliminar
+                        // Contenido en primer plano
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp)
+                        ) {
+                            items(computadores.filter {
+                                it.marca.contains(
+                                    query,
+                                    ignoreCase = true
+                                ) || it.modelo.contains(
+                                    query,
+                                    ignoreCase = true
+                                ) || it.numeroSerie.contains(
+                                    query,
+                                    ignoreCase = true
+                                ) || it.estado.contains(
+                                    query,
+                                    ignoreCase = true
+                                )
+                            }) { computador ->
+                                var iconVisible by remember { mutableStateOf(false) }
+
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    elevation = CardDefaults.cardElevation(100.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = Color.White.copy(alpha = 0.5f)// Color blanco para la tarjeta
+                                    )
+                                ) {
                                     Row(
+                                        modifier = Modifier
+                                            .padding(16.dp)
+                                            .fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.End
+                                        horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = "Editar",
-                                            modifier = Modifier
-                                                .size(24.dp)
-                                                .clickable {
-                                                    computadorAEditar = computador
-                                                    marca = computador.marca
-                                                    modelo = computador.modelo
-                                                    numeroSerie = computador.numeroSerie
-                                                    estado = computador.estado
-                                                    mostrarDialogoEditar = true
-                                                },
-                                            tint = Color.Black
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Icon(
-                                            imageVector = Icons.Default.Delete,
-                                            contentDescription = "Eliminar",
-                                            modifier = Modifier
-                                                .size(24.dp)
-                                                .clickable {
-                                                    scope.launch {
-                                                        computadorRepository.eliminar(computador)
-                                                        computadores = computadorRepository.obtenerTodosLosComputadores()
-                                                    }
-                                                },
-                                            tint = Color(color = 0xFFE20000)
-                                        )
+                                        // Información del computador
+                                        Column(
+                                            modifier = Modifier.weight(1f)
+                                        ) {
+                                            Text(
+                                                text = "Marca: ${computador.marca}",
+                                                fontSize = 18.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Text(
+                                                text = "Modelo: ${computador.modelo}",
+                                                fontSize = 16.sp
+                                            )
+                                            Text(
+                                                text = "Número de Serie: ${computador.numeroSerie}",
+                                                fontSize = 14.sp
+                                            )
+                                            Text(
+                                                text = "Estado: ${computador.estado}",
+                                                fontSize = 14.sp
+                                            )
+                                        }
+
+                                        // Íconos de editar y eliminar
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.End
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Editar",
+                                                modifier = Modifier
+                                                    .size(24.dp)
+                                                    .clickable {
+                                                        computadorAEditar = computador
+                                                        marca = computador.marca
+                                                        modelo = computador.modelo
+                                                        numeroSerie = computador.numeroSerie
+                                                        estado = computador.estado
+                                                        mostrarDialogoEditar = true
+                                                    },
+                                                tint = Color.Black
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Icon(
+                                                imageVector = Icons.Default.Delete,
+                                                contentDescription = "Eliminar",
+                                                modifier = Modifier
+                                                    .size(24.dp)
+                                                    .clickable {
+                                                        scope.launch {
+                                                            computadorRepository.eliminar(computador)
+                                                            computadores =
+                                                                computadorRepository.obtenerTodosLosComputadores()
+                                                        }
+                                                    },
+                                                tint = Color(color = 0xFFE20000)
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    // Dialogo para editar el computador
-                    if (mostrarDialogoEditar && computadorAEditar != null) {
-                        AlertDialog(
-                            onDismissRequest = { mostrarDialogoEditar = false },
-                            title = { Text("Editar Computador") },
-                            text = {
-                                Column {
-                                    Text("Modifica los campos del computador aquí")
-                                    TextField(
-                                        value = marca,
-                                        onValueChange = { marca = it },
-                                        label = { Text("Marca") }
-                                    )
-                                    TextField(
-                                        value = modelo,
-                                        onValueChange = { modelo = it },
-                                        label = { Text("Modelo") }
-                                    )
-                                    TextField(
-                                        value = numeroSerie,
-                                        onValueChange = { numeroSerie = it },
-                                        label = { Text("Número de Serie") }
-                                    )
-                                    TextField(
-                                        value = estado,
-                                        onValueChange = { estado = it },
-                                        label = { Text("Estado") }
-                                    )
-                                }
-                            },
-                            confirmButton = {
-                                Button(onClick = {
-                                    // Lógica para guardar cambios en el computador
-                                    val computadorModificado = computadorAEditar?.copy(
-                                        marca = marca,
-                                        modelo = modelo,
-                                        numeroSerie = numeroSerie,
-                                        estado = estado
-                                    )
-                                    computadorModificado?.let {
-                                        scope.launch {
-                                            computadorRepository.actualizar(it)
-                                            computadores = computadorRepository.obtenerTodosLosComputadores()
-                                        }
+                        // Dialogo para editar el computador
+                        if (mostrarDialogoEditar && computadorAEditar != null) {
+                            AlertDialog(
+                                onDismissRequest = { mostrarDialogoEditar = false },
+                                title = { Text("Editar Computador") },
+                                text = {
+                                    Column {
+                                        Text("Modifica los campos del computador aquí")
+                                        TextField(
+                                            value = marca,
+                                            onValueChange = { marca = it },
+                                            label = { Text("Marca") }
+                                        )
+                                        TextField(
+                                            value = modelo,
+                                            onValueChange = { modelo = it },
+                                            label = { Text("Modelo") }
+                                        )
+                                        TextField(
+                                            value = numeroSerie,
+                                            onValueChange = { numeroSerie = it },
+                                            label = { Text("Número de Serie") }
+                                        )
+                                        TextField(
+                                            value = estado,
+                                            onValueChange = { estado = it },
+                                            label = { Text("Estado") }
+                                        )
                                     }
-                                    mostrarDialogoEditar = false
-                                }) {
-                                    Text("Guardar")
+                                },
+                                confirmButton = {
+                                    Button(onClick = {
+                                        // Lógica para guardar cambios en el computador
+                                        val computadorModificado = computadorAEditar?.copy(
+                                            marca = marca,
+                                            modelo = modelo,
+                                            numeroSerie = numeroSerie,
+                                            estado = estado
+                                        )
+                                        computadorModificado?.let {
+                                            scope.launch {
+                                                computadorRepository.actualizar(it)
+                                                computadores =
+                                                    computadorRepository.obtenerTodosLosComputadores()
+                                            }
+                                        }
+                                        mostrarDialogoEditar = false
+                                    }) {
+                                        Text("Guardar")
+                                    }
+                                },
+                                dismissButton = {
+                                    Button(onClick = { mostrarDialogoEditar = false }) {
+                                        Text("Cancelar")
+                                    }
                                 }
-                            },
-                            dismissButton = {
-                                Button(onClick = { mostrarDialogoEditar = false }) {
-                                    Text("Cancelar")
-                                }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }

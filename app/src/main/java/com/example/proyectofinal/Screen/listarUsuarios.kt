@@ -32,9 +32,13 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun listarUsuarios(navController: NavController, usuarioRepository: UsuarioRepository) {
+fun listarUsuarios(
+    navController: NavController,
+    usuarioRepository: UsuarioRepository
+) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
     var usuarios by remember { mutableStateOf(listOf<Usuario>()) }
     var usuarioAEditar by remember { mutableStateOf<Usuario?>(null) }
     var mostrarDialogoEditar by remember { mutableStateOf(false) }
@@ -96,7 +100,7 @@ fun listarUsuarios(navController: NavController, usuarioRepository: UsuarioRepos
                     TopAppBar(
                         title = {
                             Text(
-                                text = "Zona de validación",
+                                text = "Listado de usuarios",
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.Black,
@@ -168,7 +172,6 @@ fun listarUsuarios(navController: NavController, usuarioRepository: UsuarioRepos
                                 unfocusedBorderColor = Color.Black // Borde negro cuando no está enfocado
                             )
                         )
-
                         // Listado de usuarios
                         LazyColumn(
                             modifier = Modifier
