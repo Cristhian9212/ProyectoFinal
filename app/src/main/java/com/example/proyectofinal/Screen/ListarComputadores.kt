@@ -1,5 +1,6 @@
 package com.example.proyectofinal
 
+import android.database.sqlite.SQLiteConstraintException
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,8 +11,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -45,7 +48,7 @@ fun ListarComputadores(navController: NavController, computadorRepository: Compu
 
     // Estado para el filtro de búsqueda
     var query by remember { mutableStateOf("") }
-
+    val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(Unit) {
         computadores = computadorRepository.obtenerTodosLosComputadores()
     }
@@ -78,6 +81,33 @@ fun ListarComputadores(navController: NavController, computadorRepository: Compu
         gesturesEnabled = true
     ) {
         Scaffold(
+            snackbarHost = {
+                SnackbarHost(hostState = snackbarHostState) { data ->
+                    Snackbar(
+                        modifier = Modifier
+                            .padding(24.dp)
+                            .fillMaxWidth(0.9f)
+                            .height(70.dp),
+                        content = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.udec), // Imagen personalizada
+                                    contentDescription = null,
+                                    modifier = Modifier.size(36.dp)
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(
+                                    text = data.visuals.message,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    )
+                }
+            },
             topBar = {
                 Box(
                     modifier = Modifier
@@ -255,9 +285,14 @@ fun ListarComputadores(navController: NavController, computadorRepository: Compu
                                                     .size(24.dp)
                                                     .clickable {
                                                         scope.launch {
-                                                            computadorRepository.eliminar(computador)
-                                                            computadores =
-                                                                computadorRepository.obtenerTodosLosComputadores()
+                                                            try{
+                                                                computadorRepository.eliminar(computador)
+                                                                computadores = computadorRepository.obtenerTodosLosComputadores()
+                                                            }catch (e: SQLiteConstraintException){
+                                                                snackbarHostState.showSnackbar(
+                                                                    "No se puede eliminar: el computador está asignado a otros registros."
+                                                                )
+                                                            }
                                                         }
                                                     },
                                                 tint = Color(color = 0xFFE20000)
@@ -299,7 +334,7 @@ fun ListarComputadores(navController: NavController, computadorRepository: Compu
                                     }
                                 },
                                 confirmButton = {
-                                    Button(onClick = {
+                                    IconButton(onClick = {
                                         // Lógica para guardar cambios en el computador
                                         val computadorModificado = computadorAEditar?.copy(
                                             marca = marca,
@@ -310,24 +345,30 @@ fun ListarComputadores(navController: NavController, computadorRepository: Compu
                                         computadorModificado?.let {
                                             scope.launch {
                                                 computadorRepository.actualizar(it)
-                                                computadores =
-                                                    computadorRepository.obtenerTodosLosComputadores()
+                                                computadores = computadorRepository.obtenerTodosLosComputadores()
                                             }
                                         }
                                         mostrarDialogoEditar = false
                                     }) {
-                                        Text("Guardar")
+                                        Icon(
+                                            imageVector = Icons.Default.Done, // Icono de "Guardar"
+                                            contentDescription = "Guardar"
+                                        )
                                     }
                                 },
                                 dismissButton = {
-                                    Button(onClick = { mostrarDialogoEditar = false }) {
-                                        Text("Cancelar")
+                                    IconButton(onClick = { mostrarDialogoEditar = false }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Close, // Icono de "Cancelar"
+                                            contentDescription = "Cancelar"
+                                        )
                                     }
                                 }
                             )
                         }
                     }
                 }
+                SnackbarHost(hostState = snackbarHostState)
             }
         )
     }

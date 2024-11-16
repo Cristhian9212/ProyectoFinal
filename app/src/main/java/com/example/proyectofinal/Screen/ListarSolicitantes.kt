@@ -1,5 +1,6 @@
 package com.example.proyectofinal
 
+import android.database.sqlite.SQLiteConstraintException
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -56,6 +57,7 @@ fun ListarSolicitantes(
     var telefono by remember { mutableStateOf("") }
     var idUsuarioSeleccionado by remember { mutableStateOf<Int?>(null) } // ID seleccionado en el Dropdown
 
+    val snackbarHostState = remember { SnackbarHostState() }
     var query by remember { mutableStateOf("") }
 
     // Cargar los solicitantes y usuarios disponibles
@@ -92,6 +94,33 @@ fun ListarSolicitantes(
         gesturesEnabled = true
     ) {
         Scaffold(
+            snackbarHost = {
+                SnackbarHost(hostState = snackbarHostState) { data ->
+                    Snackbar(
+                        modifier = Modifier
+                            .padding(24.dp)
+                            .fillMaxWidth(0.9f)
+                            .height(70.dp),
+                        content = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.udec), // Imagen personalizada
+                                    contentDescription = null,
+                                    modifier = Modifier.size(36.dp)
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(
+                                    text = data.visuals.message,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    )
+                }
+            },
             topBar = {
                 Box(
                     modifier = Modifier
@@ -261,11 +290,17 @@ fun ListarSolicitantes(
                                                     .size(24.dp)
                                                     .clickable {
                                                         scope.launch {
-                                                            solicitanteRepository.eliminar(
-                                                                solicitante
-                                                            )
-                                                            solicitantesConUsuarios =
-                                                                solicitanteRepository.obtenerSolicitantesConUsuarios()
+                                                            try {
+                                                                solicitanteRepository.eliminar(
+                                                                    solicitante
+                                                                )
+                                                                solicitantesConUsuarios =
+                                                                    solicitanteRepository.obtenerSolicitantesConUsuarios()
+                                                            }catch (e: SQLiteConstraintException){
+                                                                snackbarHostState.showSnackbar(
+                                                                    "No se puede eliminar: el estudiante está asignado a otros registros."
+                                                                )
+                                                            }
                                                         }
                                                     },
                                                 tint = Color(color = 0xFFE20000)
@@ -392,6 +427,8 @@ fun ListarSolicitantes(
                         }
                     }
                 }
+
+                SnackbarHost(hostState = snackbarHostState)
             }
         )
     }

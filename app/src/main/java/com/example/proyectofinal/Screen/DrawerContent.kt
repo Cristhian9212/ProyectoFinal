@@ -82,13 +82,13 @@ fun DrawerContent(onNavigate: (String) -> Unit) {
 
                         Column {
                             Text(
-                                text = "Título de la Card",
+                                text = "Plataforma de navegacion",
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.Black
                             )
                             Text(
-                                text = "Descripción opcional",
+                                text = "Escoja la opcion solicitada",
                                 fontSize = 14.sp,
                                 color = Color.Black
                             )

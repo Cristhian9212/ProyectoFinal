@@ -10,8 +10,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -29,6 +31,7 @@ import com.example.proyectofinal.Model.Usuario
 import com.example.proyectofinal.Repository.UsuarioRepository
 import com.example.proyectofinal.Screen.DrawerContent
 import kotlinx.coroutines.launch
+import android.database.sqlite.SQLiteConstraintException
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +52,9 @@ fun listarUsuarios(
 
     // Estado para el filtro de búsqueda
     var query by remember { mutableStateOf("") }
+
+    // Snackbar personalizado para advertencias
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         usuarios = usuarioRepository.obtenerTodosUsuarios()
@@ -83,11 +89,38 @@ fun listarUsuarios(
         gesturesEnabled = true
     ) {
         Scaffold(
+            snackbarHost = {
+                SnackbarHost(hostState = snackbarHostState) { data ->
+                    Snackbar(
+                        modifier = Modifier
+                            .padding(24.dp)
+                            .fillMaxWidth(0.9f)
+                            .height(70.dp),
+                        content = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.udec), // Imagen personalizada
+                                    contentDescription = null,
+                                    modifier = Modifier.size(36.dp)
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(
+                                    text = data.visuals.message,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    )
+                }
+            },
             topBar = {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp) // Ajustamos la altura para incluir la imagen iniciosup
+                        .height(100.dp)
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.iniciosup),
@@ -105,12 +138,11 @@ fun listarUsuarios(
                                 fontWeight = FontWeight.Bold,
                                 color = Color.Black,
                                 modifier = Modifier
-                                    .padding(6.dp) // Añade relleno blanco alrededor del texto
-                                    .border(2.dp, Color.Black, RoundedCornerShape(4.dp)) // Borde negro
-                                    .padding(6.dp) // Añade relleno blanco dentro del borde
+                                    .padding(6.dp)
+                                    .border(2.dp, Color.Black, RoundedCornerShape(4.dp))
+                                    .padding(6.dp)
                             )
                         },
-
                         navigationIcon = {
                             IconButton(onClick = { scope.launch { drawerState.open() } }) {
                                 Icon(
@@ -152,7 +184,6 @@ fun listarUsuarios(
                             .fillMaxSize()
                             .padding(paddingValues)
                     ) {
-                        // Barra de búsqueda fuera de iniciosup
                         OutlinedTextField(
                             value = query,
                             onValueChange = { query = it },
@@ -166,13 +197,12 @@ fun listarUsuarios(
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp), // Relleno para que no quede pegado
+                                .padding(16.dp),
                             colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedBorderColor = Color.Black, // Borde negro cuando está enfocado
-                                unfocusedBorderColor = Color.Black // Borde negro cuando no está enfocado
+                                focusedBorderColor = Color.Black,
+                                unfocusedBorderColor = Color.Black
                             )
                         )
-                        // Listado de usuarios
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -193,15 +223,13 @@ fun listarUsuarios(
                                     ignoreCase = true
                                 )
                             }) { usuario ->
-                                var iconVisible by remember { mutableStateOf(false) }
-
                                 Card(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(vertical = 8.dp),
                                     elevation = CardDefaults.cardElevation(100.dp),
                                     colors = CardDefaults.cardColors(
-                                        containerColor = Color.White.copy(alpha = 0.5f) // Color blanco para la tarjeta
+                                        containerColor = Color.White.copy(alpha = 0.5f)
                                     )
                                 ) {
                                     Row(
@@ -211,7 +239,6 @@ fun listarUsuarios(
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
-                                        // Información del usuario
                                         Column(
                                             modifier = Modifier.weight(1f)
                                         ) {
@@ -230,7 +257,6 @@ fun listarUsuarios(
                                             )
                                         }
 
-                                        // Íconos de editar y eliminar
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically,
                                             horizontalArrangement = Arrangement.End
@@ -258,9 +284,14 @@ fun listarUsuarios(
                                                     .size(24.dp)
                                                     .clickable {
                                                         scope.launch {
-                                                            usuarioRepository.eliminar(usuario)
-                                                            usuarios =
-                                                                usuarioRepository.obtenerTodosUsuarios()
+                                                            try {
+                                                                usuarioRepository.eliminar(usuario)
+                                                                usuarios = usuarioRepository.obtenerTodosUsuarios()
+                                                            } catch (e: SQLiteConstraintException) {
+                                                                snackbarHostState.showSnackbar(
+                                                                    "No se puede eliminar: el usuario está asignado a otros registros."
+                                                                )
+                                                            }
                                                         }
                                                     },
                                                 tint = Color(0xFFE20000)
@@ -270,7 +301,6 @@ fun listarUsuarios(
                                 }
                             }
                         }
-                        // Dialogo para editar el usuario
                         if (mostrarDialogoEditar && usuarioAEditar != null) {
                             AlertDialog(
                                 onDismissRequest = { mostrarDialogoEditar = false },
@@ -301,8 +331,7 @@ fun listarUsuarios(
                                     }
                                 },
                                 confirmButton = {
-                                    Button(onClick = {
-                                        // Lógica para guardar cambios en el usuario
+                                    IconButton(onClick = {
                                         val usuarioModificado = usuarioAEditar?.copy(
                                             nombres = nombres,
                                             apellidos = apellidos,
@@ -317,18 +346,25 @@ fun listarUsuarios(
                                             }
                                         }
                                     }) {
-                                        Text("Guardar Cambios")
+                                        Icon(
+                                            imageVector = Icons.Default.Done,
+                                            contentDescription = "Guardar Cambios"
+                                        )
                                     }
                                 },
                                 dismissButton = {
-                                    Button(onClick = { mostrarDialogoEditar = false }) {
-                                        Text("Cancelar")
+                                    IconButton(onClick = { mostrarDialogoEditar = false }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Close,
+                                            contentDescription = "Cancelar"
+                                        )
                                     }
                                 }
                             )
                         }
                     }
                 }
+                SnackbarHost(hostState = snackbarHostState)
             }
         )
     }
